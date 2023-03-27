@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Tour {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  location      String
+  description   String
+  category      TourCategory
+  creator       User          @relation(fields: [userId], references: [id])
+  logoUrl       String
+  privacyStatus PrivacyStatus
+  likeCount     Int           @default(0)
+  viewCount     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  userId        String        @db.ObjectId
+}
+
+model User {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  email        String       @unique
+  password     String
+  fullname     String
+  address      Address?
+  description  String       @default("We don't know much about you, but we're sure you are great and the profile will be completed soon.")
+  userCategory UserCategory @default(VIRTUAL_TOUR_ENTHUSIAST)
+  company      String?
+  phoneNumber  String?
+  avatarUrl    String       @default("https://media.istockphoto.com/id/1296158947/photo/portrait-of-creative-trendy-black-african-male-designer-laughing.jpg?s=612x612&w=0&k=20&c=1Ws_LSzWjYvegGxHYQkkgVytdpDcnmK0upJyGOzEPcg=")
+  coverUrl     String       @default("https://www.klapty.com/public/assets/img/default-cover.png")
+
+  tours Tour[]
+}
+
+model Scene {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  imageUrl         String
+  soundUrl         String
+  enableAutoRotate Boolean   @default(false)
+  rotateSpeed      Float     @default(0.0)
+  arrivalX         Float     @default(0.0)
+  arrivalY         Float     @default(0.0)
+  arrivalZ         Float     @default(0.0)
+  previousHotspot  Hotspot[] @relation("Next Scene")
+  containHotspot   Hotspot[] @relation("Contain Scene")
+}
+
+model Hotspot {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  scale          Float           @default(1.0)
+  opacity        Float           @default(1.0)
+  x              Float           @default(0.0)
+  y              Float           @default(0.0)
+  z              Float           @default(0.0)
+  title          String
+  description    String
+  link           String
+  imageUrl       String
+  soundUrl       String
+  hotspotStyle   HotspotStyle?   @relation(fields: [hotspotStyleId], references: [id])
+  hotspotStyleId String?         @db.ObjectId
+  transitionType TransitionType?
+  containScene   Scene?          @relation("Contain Scene", fields: [containSceneId], references: [id])
+  containSceneId String?         @db.ObjectId
+  nextScene      Scene?          @relation("Next Scene", fields: [nextSceneId], references: [id])
+  nextSceneId    String?         @db.ObjectId
+}
+
+model HotspotStyle {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  styleUrl String
+  Hotspot  Hotspot[]
+}
+
+// Address is an embedded document
+type Address {
+  street String
+  city   String
+  state  String
+  zip    String
+}
+
+enum UserCategory {
+  REAL_ESTATE_PROFESSIONAL
+  PROFESSIONAL_PHOTOGRAPHER
+  ARCHITECT_DESIGNER
+  DRONE_VIDEOGRAPHER
+  COMPANY_SHOP
+  VIRTUAL_TOUR_ENTHUSIAST
+  OTHER
+}
+
+type TourCategory {
+  categoryName String
+}
+
+enum PrivacyStatus {
+  PUBLIC
+  PRIVATE
+  DRAFT
+}
+
+enum TransitionType {
+  FADEIN
+  PARALLAX
+}
