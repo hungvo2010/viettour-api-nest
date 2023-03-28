@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Logger,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,10 +18,12 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 @Controller('/v1.0/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+  private readonly logger = new Logger(UsersController.name);
 
   @Get('/')
   @UseGuards(JwtAuthGuard)
   async getProfile(@Request() req) {
+    this.logger.log('user: ' + JSON.stringify(req.user));
     const user = await this.usersService.getProfile(req.user);
     const { password, ...returnData } = user;
     return {

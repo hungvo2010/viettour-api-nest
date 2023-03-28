@@ -11,6 +11,5 @@ export class ChangePasswordDto {
 
   @IsNotEmpty()
   @MinLength(8)
-  @Matches('newPassword')
   confirmPassword: string;
 }

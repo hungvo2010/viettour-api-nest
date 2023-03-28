@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
@@ -6,6 +6,8 @@ import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -18,7 +20,7 @@ export class UsersService {
   }
 
   async getProfile(user: any) {
-    console.log(' Inside service: ', user.userId);
+    this.logger.log('user: ' + JSON.stringify(user));
 
     return this.findByUserId(user.userId);
   }

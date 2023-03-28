@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterAuthDto } from './dto/register-auth.dto';
@@ -15,6 +16,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     private usersService: UsersService,
     private prismaService: PrismaService,
@@ -35,7 +37,7 @@ export class AuthService {
   ) {
     const user = await this.usersService.findByEmail(email);
     const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) throw new UnauthorizedException();
+    if (!isMatch) throw new UnauthorizedException('Current password is wrong');
     const hashedPassword = await bcrypt.hash(newPassword, Constant.SALT_ROUNDS);
     await this.prismaService.user.update({
       where: {
@@ -59,9 +61,6 @@ export class AuthService {
   }
 
   async generateToken(user: User) {
-    console.log(user);
-    console.log(process.env.JWT_SECRET);
-
     const payload = { email: user.email, userId: user.id };
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,

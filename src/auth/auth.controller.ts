@@ -7,6 +7,7 @@ import {
   Res,
   UnprocessableEntityException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -19,6 +20,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 @Controller('/v1.0/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+  private readonly logger = new Logger(AuthController.name);
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
@@ -66,8 +68,15 @@ export class AuthController {
   async changePassword(
     @Request() req,
     @Body() changePasswordDto: ChangePasswordDto,
+    @Res() response: Response,
   ) {
+    if (changePasswordDto.newPassword !== changePasswordDto.confirmPassword) {
+      throw new UnprocessableEntityException(
+        'Password and confirm password are not the same',
+      );
+    }
     await this.authService.changePassword(req.user, changePasswordDto);
+    response.status(HttpStatus.OK).json({});
   }
 
   @Post('/logout')
