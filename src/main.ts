@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { PrismaService } from './prisma.service';
 import { HttpExceptionFilter } from './filter/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 declare const module: any;
 
@@ -10,6 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
+  app.use(cookieParser());
   await app.listen(process.env.SERVER_PORT || 3000);
 
   if (module.hot) {

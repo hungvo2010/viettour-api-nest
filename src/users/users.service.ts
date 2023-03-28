@@ -17,6 +17,10 @@ export class UsersService {
     });
   }
 
+  async getProfile(user: any) {
+    return this.findByEmail(user.userId);
+  }
+
   findAll() {
     return `This action returns all users`;
   }
@@ -34,10 +38,18 @@ export class UsersService {
     });
   }
 
-  async findOne(email: string): Promise<User | undefined> {
+  async findByEmail(email: string): Promise<User | undefined> {
     return this.prisma.user.findUnique({
       where: {
         email,
+      },
+    });
+  }
+
+  async findByUserId(userId: string): Promise<User | undefined> {
+    return this.prisma.user.findUnique({
+      where: {
+        id: userId,
       },
     });
   }

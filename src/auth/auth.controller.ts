@@ -5,6 +5,8 @@ import {
   Request,
   Body,
   Res,
+  UnprocessableEntityException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -21,11 +23,15 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(@Request() req, @Res({ passthrough: true }) response: Response) {
-    const jwtToken = this.authService.generateToken(req.user);
-    response.cookie('jwt', jwtToken, {
+    const jwtToken = await this.authService.generateToken(req.user);
+    response.status(HttpStatus.OK).cookie('jwt', jwtToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: Constant.COOKIE_EXPIRES_IN,
+    });
+    response.json({
+      item: req.user,
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -34,14 +40,22 @@ export class AuthController {
     @Body() registerDto: RegisterAuthDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    console.log(registerDto);
-
+    if (registerDto.password !== registerDto.confirmPassword) {
+      throw new UnprocessableEntityException(
+        'Password and confirm password are not the same',
+      );
+    }
     const user = await this.authService.register(registerDto);
-    const jwtToken = this.authService.generateToken(user);
-    response.cookie('jwt', jwtToken, {
+    const jwtToken = await this.authService.generateToken(user);
+
+    response.status(HttpStatus.CREATED).cookie('jwt', jwtToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: Constant.COOKIE_EXPIRES_IN,
+    });
+    response.json({
+      item: user,
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -56,6 +70,6 @@ export class AuthController {
 
   @Post('/logout')
   async logout(@Res({ passthrough: true }) response: Response) {
-    response.clearCookie('jwt');
+    response.status(HttpStatus.OK).clearCookie('jwt');
   }
 }

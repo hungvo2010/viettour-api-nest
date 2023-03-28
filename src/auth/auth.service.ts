@@ -22,7 +22,7 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterAuthDto) {
-    const existUser = await this.usersService.findOne(registerDto.email);
+    const existUser = await this.usersService.findByEmail(registerDto.email);
     if (existUser) throw new ConflictException();
     const data = await this.prepareCreateUserDto(registerDto);
     const user = await this.usersService.create(data);
@@ -31,18 +31,12 @@ export class AuthService {
 
   async changePassword(
     { email, userId },
-    changePasswordDto: ChangePasswordDto,
+    { currentPassword, newPassword }: ChangePasswordDto,
   ) {
-    const user = await this.usersService.findOne(email);
-    const isMatch = await bcrypt.compare(
-      changePasswordDto.currentPassword,
-      user.password,
-    );
+    const user = await this.usersService.findByEmail(email);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) throw new UnauthorizedException();
-    const hashedPassword = await bcrypt.hash(
-      changePasswordDto.newPassword,
-      Constant.SALT_ROUNDS,
-    );
+    const hashedPassword = await bcrypt.hash(newPassword, Constant.SALT_ROUNDS);
     await this.prismaService.user.update({
       where: {
         id: userId,
@@ -54,7 +48,7 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findOne(email);
+    const user = await this.usersService.findByEmail(email);
     if (!user) throw new UnauthorizedException();
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
@@ -65,6 +59,9 @@ export class AuthService {
   }
 
   async generateToken(user: User) {
+    console.log(user);
+    console.log(process.env.JWT_SECRET);
+
     const payload = { email: user.email, userId: user.id };
     return this.jwtService.sign(payload);
   }
