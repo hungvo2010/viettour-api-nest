@@ -25,7 +25,8 @@ export class AuthService {
 
   async register(registerDto: RegisterAuthDto) {
     const existUser = await this.usersService.findByEmail(registerDto.email);
-    if (existUser) throw new ConflictException();
+    if (existUser)
+      throw new ConflictException('An account with this email already exists');
     const data = await this.prepareCreateUserDto(registerDto);
     const user = await this.usersService.create(data);
     return user;
@@ -51,13 +52,14 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    if (!user) throw new UnauthorizedException();
+    if (!user)
+      throw new UnauthorizedException('Your email or password is wrong');
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
       const { password, ...result } = user;
       return result;
     }
-    throw new UnauthorizedException();
+    throw new UnauthorizedException('Your email or password is wrong');
   }
 
   async generateToken(user: User) {

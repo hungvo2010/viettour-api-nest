@@ -4,7 +4,8 @@ import { PrismaService } from './prisma.service';
 import { HttpExceptionFilter } from './filter/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
-import { CustomLogger } from './auth/logger/custom-logger';
+import { CommonExceptionFilter } from './filter/common-exception.filter';
+import { CustomLogger } from './logger/custom-logger';
 
 declare const module: any;
 
@@ -12,10 +13,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new CustomLogger(),
   });
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new HttpExceptionFilter(), new CommonExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: process.env.ALLLOWED_CROSS_ORIGIN,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });

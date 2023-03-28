@@ -8,6 +8,7 @@ import {
   UnprocessableEntityException,
   HttpStatus,
   Logger,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -65,6 +66,7 @@ export class AuthController {
 
   @Post('/change-password')
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   async changePassword(
     @Request() req,
     @Body() changePasswordDto: ChangePasswordDto,
@@ -76,11 +78,16 @@ export class AuthController {
       );
     }
     await this.authService.changePassword(req.user, changePasswordDto);
-    response.status(HttpStatus.OK).json({});
+    return {
+      item: {},
+      message: 'Password changed successfully',
+      timestamp: new Date().toISOString(),
+    };
   }
 
   @Post('/logout')
+  @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) response: Response) {
-    response.status(HttpStatus.OK).clearCookie('jwt');
+    response.clearCookie('jwt');
   }
 }
