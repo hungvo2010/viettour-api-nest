@@ -29,8 +29,9 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       maxAge: Constant.COOKIE_EXPIRES_IN,
     });
+    const { password, ...user } = req.user;
     response.json({
-      item: req.user,
+      item: user,
       timestamp: new Date().toISOString(),
     });
   }
@@ -53,8 +54,9 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       maxAge: Constant.COOKIE_EXPIRES_IN,
     });
+    const { password, ...returnData } = user;
     response.json({
-      item: user,
+      item: returnData,
       timestamp: new Date().toISOString(),
     });
   }

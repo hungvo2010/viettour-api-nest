@@ -63,7 +63,10 @@ export class AuthService {
     console.log(process.env.JWT_SECRET);
 
     const payload = { email: user.email, userId: user.id };
-    return this.jwtService.sign(payload);
+    return this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: Constant.JWT_EXPIRES_IN,
+    });
   }
 
   async prepareCreateUserDto(registerDto: RegisterAuthDto) {

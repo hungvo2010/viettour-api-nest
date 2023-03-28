@@ -18,7 +18,9 @@ export class UsersService {
   }
 
   async getProfile(user: any) {
-    return this.findByEmail(user.userId);
+    console.log(' Inside service: ', user.userId);
+
+    return this.findByUserId(user.userId);
   }
 
   findAll() {

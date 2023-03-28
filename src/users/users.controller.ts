@@ -22,8 +22,9 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async getProfile(@Request() req) {
     const user = await this.usersService.getProfile(req.user);
+    const { password, ...returnData } = user;
     return {
-      item: user,
+      item: returnData,
       timestamp: new Date().toISOString(),
     };
   }

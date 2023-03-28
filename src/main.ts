@@ -11,6 +11,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  });
   app.use(cookieParser());
   await app.listen(process.env.SERVER_PORT || 3000);
 
