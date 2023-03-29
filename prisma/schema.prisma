@@ -13,22 +13,23 @@ datasource db {
 model Tour {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   name          String
-  location      String
-  description   String
-  category      TourCategory
-  creator       User          @relation(fields: [userId], references: [id])
-  logoUrl       String
-  privacyStatus PrivacyStatus
+  location      String        @default("")
+  description   String        @default("")
+  category      TourCategory  @default(REAL_ESTATE)
+  creator       User          @relation(fields: [creatorId], references: [id])
+  logoUrl       String        @default("https://www.kindpng.com/picc/m/286-2864921_blender-logo-blender-3d-logo-hd-png-download.png")
+  privacyStatus PrivacyStatus @default(DRAFT)
   likeCount     Int           @default(0)
   viewCount     Int           @default(0)
   createdAt     DateTime      @default(now())
-  userId        String        @db.ObjectId
+  creatorId     String        @db.ObjectId
+  scenes        Scene[]
 }
 
 model User {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
   email        String       @unique
-  password     String
+  password     String?
   fullname     String
   address      Address?
   description  String       @default("We don't know much about you, but we're sure you are great and the profile will be completed soon.")
@@ -45,7 +46,7 @@ model Scene {
   id               String    @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   imageUrl         String
-  soundUrl         String
+  soundUrl         String?
   enableAutoRotate Boolean   @default(false)
   rotateSpeed      Float     @default(0.0)
   arrivalX         Float     @default(0.0)
@@ -53,6 +54,8 @@ model Scene {
   arrivalZ         Float     @default(0.0)
   previousHotspot  Hotspot[] @relation("Next Scene")
   containHotspot   Hotspot[] @relation("Contain Scene")
+  Tour             Tour?     @relation(fields: [tourId], references: [id])
+  tourId           String    @db.ObjectId
 }
 
 model Hotspot {
@@ -100,8 +103,15 @@ enum UserCategory {
   OTHER
 }
 
-type TourCategory {
-  categoryName String
+enum TourCategory {
+  REAL_ESTATE
+  EVENTS_EXHIBITION
+  LANDSCAPE_NATURE
+  ARTS_DRAWING_CREATIVITY
+  TOURISM_HERITAGE_SITES
+  BUSINESS_COMPANIES_INDUSTRIES
+  SCHOOL_COLLEGES_EDUCATION
+  OTHER
 }
 
 enum PrivacyStatus {

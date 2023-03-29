@@ -5,13 +5,12 @@ import { HttpExceptionFilter } from './filter/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { CommonExceptionFilter } from './filter/common-exception.filter';
-import { CustomLogger } from './logger/custom-logger';
 
 declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: new CustomLogger(),
+    logger: ['error', 'warn', 'debug', 'verbose', 'log'],
   });
   app.useGlobalFilters(new HttpExceptionFilter(), new CommonExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());

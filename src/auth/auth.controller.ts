@@ -1,3 +1,4 @@
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 import {
   Controller,
   Post,
@@ -9,6 +10,8 @@ import {
   HttpStatus,
   Logger,
   HttpCode,
+  Get,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -64,13 +67,36 @@ export class AuthController {
     });
   }
 
+  @Get('/google/login')
+  @UseGuards(GoogleAuthGuard)
+  handleGoogleLogin() {
+    return {};
+  }
+
+  @Get('/google/redirect')
+  @UseGuards(GoogleAuthGuard)
+  async handleRedirect(
+    @Req() req,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const newUser = await this.authService.handleGoogleLogin(req.user._json);
+    const jwtToken = await this.authService.generateToken(newUser);
+
+    response.status(HttpStatus.CREATED).cookie('jwt', jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: Constant.COOKIE_EXPIRES_IN,
+    });
+
+    response.redirect(`http://localhost:3000/`);
+  }
+
   @Post('/change-password')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async changePassword(
     @Request() req,
     @Body() changePasswordDto: ChangePasswordDto,
-    @Res() response: Response,
   ) {
     if (changePasswordDto.newPassword !== changePasswordDto.confirmPassword) {
       throw new UnprocessableEntityException(

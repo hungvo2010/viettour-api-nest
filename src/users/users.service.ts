@@ -33,6 +33,19 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
+  async upsert(user: any) {
+    const data: Prisma.UserCreateInput = {
+      ...user,
+    };
+    return await this.prisma.user.upsert({
+      where: {
+        email: user.email,
+      },
+      update: data,
+      create: data,
+    });
+  }
+
   delete(id) {
     const where: Prisma.UserWhereUniqueInput = {
       id,
