@@ -10,6 +10,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  email        String       @unique
+  password     String
+  fullname     String
+  address      Address?
+  description  String       @default("We don't know much about you, but we're sure you are great and the profile will be completed soon.")
+  userCategory UserCategory @default(VIRTUAL_TOUR_ENTHUSIAST)
+  company      String?
+  phoneNumber  String?
+  avatarUrl    String       @default("https://media.istockphoto.com/id/1296158947/photo/portrait-of-creative-trendy-black-african-male-designer-laughing.jpg?s=612x612&w=0&k=20&c=1Ws_LSzWjYvegGxHYQkkgVytdpDcnmK0upJyGOzEPcg=")
+  coverUrl     String       @default("https://www.klapty.com/public/assets/img/default-cover.png")
+
+  tours Tour[]
+}
+
 model Tour {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   name          String
@@ -26,32 +42,23 @@ model Tour {
   scenes        Scene[]
 }
 
-model User {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  email        String       @unique
-  password     String?
-  fullname     String
-  address      Address?
-  description  String       @default("We don't know much about you, but we're sure you are great and the profile will be completed soon.")
-  userCategory UserCategory @default(VIRTUAL_TOUR_ENTHUSIAST)
-  company      String?
-  phoneNumber  String?
-  avatarUrl    String       @default("https://media.istockphoto.com/id/1296158947/photo/portrait-of-creative-trendy-black-african-male-designer-laughing.jpg?s=612x612&w=0&k=20&c=1Ws_LSzWjYvegGxHYQkkgVytdpDcnmK0upJyGOzEPcg=")
-  coverUrl     String       @default("https://www.klapty.com/public/assets/img/default-cover.png")
-
-  tours Tour[]
-}
-
 model Scene {
   id               String    @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   imageUrl         String
   soundUrl         String?
+  is2D             Boolean   @default(false)
+  thumbnailUrl     String?
+  hotspotUrl       String?
   enableAutoRotate Boolean   @default(false)
   rotateSpeed      Float     @default(0.0)
   arrivalX         Float     @default(0.0)
   arrivalY         Float     @default(0.0)
   arrivalZ         Float     @default(0.0)
+  dateUploaded     DateTime  @default(now())
+  dateModified     DateTime  @default(now())
+  dimensions       Dimension
+  type             String    @default("image/png")
   previousHotspot  Hotspot[] @relation("Next Scene")
   containHotspot   Hotspot[] @relation("Contain Scene")
   Tour             Tour?     @relation(fields: [tourId], references: [id])
@@ -91,6 +98,11 @@ type Address {
   city   String
   state  String
   zip    String
+}
+
+type Dimension {
+  width  Int
+  height Int
 }
 
 enum UserCategory {

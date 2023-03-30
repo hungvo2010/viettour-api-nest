@@ -1,4 +1,4 @@
-import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { GoogleAuthGuard } from '../guards/google-auth.guard';
 import {
   Controller,
   Post,
@@ -14,12 +14,12 @@ import {
   Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
+import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { Response } from 'express';
 import { Constant } from 'src/constant';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('/v1.0/auth')
 export class AuthController {
