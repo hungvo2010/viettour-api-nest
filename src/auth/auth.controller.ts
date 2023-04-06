@@ -108,6 +108,6 @@ export class AuthController {
   @Post('/logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) response: Response) {
-    response.clearCookie('jwt');
+    response.clearCookie('jwt', Constant.COOKIE_OPTIONS);
   }
 }
