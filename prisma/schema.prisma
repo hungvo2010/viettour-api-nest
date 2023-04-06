@@ -23,81 +23,128 @@ model User {
   avatarUrl    String       @default("https://media.istockphoto.com/id/1296158947/photo/portrait-of-creative-trendy-black-african-male-designer-laughing.jpg?s=612x612&w=0&k=20&c=1Ws_LSzWjYvegGxHYQkkgVytdpDcnmK0upJyGOzEPcg=")
   coverUrl     String       @default("https://www.klapty.com/public/assets/img/default-cover.png")
 
-  tours Tour[]
+  tours EmbeddedTour[]
 }
 
 model Tour {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  location      String        @default("")
-  description   String        @default("")
-  category      TourCategory  @default(REAL_ESTATE)
-  creator       User          @relation(fields: [creatorId], references: [id])
-  logoUrl       String        @default("https://www.kindpng.com/picc/m/286-2864921_blender-logo-blender-3d-logo-hd-png-download.png")
-  privacyStatus PrivacyStatus @default(DRAFT)
-  likeCount     Int           @default(0)
-  viewCount     Int           @default(0)
-  createdAt     DateTime      @default(now())
-  creatorId     String        @db.ObjectId
-  scenes        Scene[]
+  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  address             Address?
+  description         String        @default("")
+  socialImage         String        @default("")
+  category            TourCategory  @default(REAL_ESTATE)
+  creator             Creator
+  logoUrl             String        @default("https://www.kindpng.com/picc/m/286-2864921_blender-logo-blender-3d-logo-hd-png-download.png")
+  privacyStatus       PrivacyStatus @default(DRAFT)
+  likeCount           Int           @default(0)
+  viewCount           Int           @default(0)
+  isPasswordProtected Boolean       @default(false)
+  password            String?
+  createdAt           DateTime      @default(now())
+  modifiedAt          DateTime      @default(now())
+  floorPlan           FloorPlan?
+  scenes              SceneTour[]
+}
+
+type Creator {
+  userId       String
+  fullname     String
+  avatarUrl    String
+  address      Address?
+  description  String
+  userCategory UserCategory
+  phoneNumber  String?
+}
+
+type EmbeddedTour {
+  tourId      String?
+  name        String?
+  address     Address?
+  description String?       @default("")
+  socialImage String?       @default("")
+  category    TourCategory? @default(REAL_ESTATE)
+  createdAt   DateTime?     @default(now())
+  modifiedAt  DateTime?     @default(now())
 }
 
 model Scene {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  id               String      @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   imageUrl         String
   soundUrl         String?
-  is2D             Boolean   @default(false)
+  is2D             Boolean     @default(false)
   thumbnailUrl     String?
   hotspotUrl       String?
-  enableAutoRotate Boolean   @default(false)
-  rotateSpeed      Float     @default(0.0)
-  arrivalX         Float     @default(0.0)
-  arrivalY         Float     @default(0.0)
-  arrivalZ         Float     @default(0.0)
-  dateUploaded     DateTime  @default(now())
-  dateModified     DateTime  @default(now())
+  enableAutoRotate Boolean     @default(false)
+  rotateSpeed      Float       @default(0.0)
+  arrivalX         Float       @default(0.0)
+  arrivalY         Float       @default(0.0)
+  arrivalZ         Float       @default(0.0)
+  dateUploaded     DateTime    @default(now())
+  dateModified     DateTime    @default(now())
   dimensions       Dimension
-  type             String    @default("image/png")
-  previousHotspot  Hotspot[] @relation("Next Scene")
-  containHotspot   Hotspot[] @relation("Contain Scene")
-  Tour             Tour?     @relation(fields: [tourId], references: [id])
-  tourId           String    @db.ObjectId
+  type             String      @default("image/png")
+  previousHotspot  Hotspot[]   @relation("Next Scene")
+  containHotspot   Hotspot[]   @relation("Contain Scene")
+  tours            SceneTour[]
+}
+
+model SceneTour {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  scene   Scene  @relation(fields: [sceneId], references: [id])
+  sceneId String @db.ObjectId
+  tour    Tour   @relation(fields: [tourId], references: [id])
+  tourId  String @db.ObjectId
+  order   Int
 }
 
 model Hotspot {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  scale          Float           @default(1.0)
-  opacity        Float           @default(1.0)
-  x              Float           @default(0.0)
-  y              Float           @default(0.0)
-  z              Float           @default(0.0)
+  id             String                @id @default(auto()) @map("_id") @db.ObjectId
+  scale          Float                 @default(1.0)
+  opacity        Float                 @default(1.0)
+  x              Float                 @default(0.0)
+  y              Float                 @default(0.0)
+  z              Float                 @default(0.0)
   title          String
   description    String
   link           String
   imageUrl       String
   soundUrl       String
-  hotspotStyle   HotspotStyle?   @relation(fields: [hotspotStyleId], references: [id])
-  hotspotStyleId String?         @db.ObjectId
+  hotspotStyle   EmbeddedHotspotStyle?
   transitionType TransitionType?
-  containScene   Scene?          @relation("Contain Scene", fields: [containSceneId], references: [id])
-  containSceneId String?         @db.ObjectId
-  nextScene      Scene?          @relation("Next Scene", fields: [nextSceneId], references: [id])
-  nextSceneId    String?         @db.ObjectId
+  containScene   Scene?                @relation("Contain Scene", fields: [containSceneId], references: [id])
+  containSceneId String?               @db.ObjectId
+  nextScene      Scene?                @relation("Next Scene", fields: [nextSceneId], references: [id])
+  nextSceneId    String?               @db.ObjectId
+}
+
+type EmbeddedHotspotStyle {
+  id       String
+  styleUrl String
 }
 
 model HotspotStyle {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
   styleUrl String
-  Hotspot  Hotspot[]
+}
+
+type FloorPlan {
+  floorPlanUrl String
+  dimensions   Dimension
+  points       Point[]
+}
+
+type Point {
+  x       Int
+  y       Int
+  sceneId String
 }
 
 // Address is an embedded document
 type Address {
-  street String
-  city   String
-  state  String
-  zip    String
+  name String
+  lat  Float
+  lng  Float
 }
 
 type Dimension {

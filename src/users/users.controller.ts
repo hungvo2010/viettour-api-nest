@@ -32,23 +32,36 @@ export class UsersController {
     };
   }
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Get(':userId')
+  async getUser(@Param('userId') userId: string) {
+    const user = await this.usersService.findByUserId(userId);
+    const { password, ...returnData } = user;
+    return {
+      item: returnData,
+      timestamp: new Date().toISOString(),
+    };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findByEmail(id);
+  @Post(':userId')
+  update(
+    @Param('userId') userId: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.update(userId, updateUserDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
+  // @Post()
+  // create(@Body() createUserDto: CreateUserDto) {
+  //   return this.usersService.create(createUserDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.delete(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.usersService.findByEmail(id);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.usersService.delete(+id);
+  // }
 }

@@ -29,8 +29,9 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(id: string, updateUserDto: UpdateUserDto) {
+    // return `This action updates a #${id} user`;
+    return '';
   }
 
   async upsert(user: any) {
@@ -42,7 +43,10 @@ export class UsersService {
         email: user.email,
       },
       update: data,
-      create: data,
+      create: {
+        ...data,
+        password: '',
+      },
     });
   }
 
@@ -67,6 +71,9 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: {
         id: userId,
+      },
+      include: {
+        tours: true,
       },
     });
   }
