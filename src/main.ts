@@ -20,7 +20,7 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
   app.use(cookieParser());
-  await app.listen(process.env.PORT || 8080);
+  await app.listen(parseInt(process.env.PORT) || 3000);
 
   if (module.hot) {
     module.hot.accept();
