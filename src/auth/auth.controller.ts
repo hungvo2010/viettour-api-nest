@@ -30,11 +30,9 @@ export class AuthController {
   @Post('/login')
   async login(@Request() req, @Res({ passthrough: true }) response: Response) {
     const jwtToken = await this.authService.generateToken(req.user);
-    response.status(HttpStatus.OK).cookie('jwt', jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: Constant.COOKIE_EXPIRES_IN,
-    });
+    response
+      .status(HttpStatus.OK)
+      .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
     const { password, ...user } = req.user;
     response.json({
       item: user,
@@ -55,11 +53,9 @@ export class AuthController {
     const user = await this.authService.register(registerDto);
     const jwtToken = await this.authService.generateToken(user);
 
-    response.status(HttpStatus.CREATED).cookie('jwt', jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: Constant.COOKIE_EXPIRES_IN,
-    });
+    response
+      .status(HttpStatus.CREATED)
+      .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
     const { password, ...returnData } = user;
     response.json({
       item: returnData,
@@ -82,13 +78,11 @@ export class AuthController {
     const newUser = await this.authService.handleGoogleLogin(req.user._json);
     const jwtToken = await this.authService.generateToken(newUser);
 
-    response.status(HttpStatus.CREATED).cookie('jwt', jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: Constant.COOKIE_EXPIRES_IN,
-    });
+    response
+      .status(HttpStatus.CREATED)
+      .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
 
-    response.redirect(`http://localhost:3000/`);
+    response.redirect(process.env.ALLLOWED_CROSS_ORIGIN);
   }
 
   @Post('/change-password')
