@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class AppService {
   constructor(private configService: ConfigService) {}
+  private readonly logger = new Logger(AppService.name);
   getHello(): string {
+    this.logger.log(process.env.COOKIE_DOMAIN);
     return 'Hello World!';
   }
 }
