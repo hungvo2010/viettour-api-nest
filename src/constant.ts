@@ -9,9 +9,9 @@ export class Constant {
   static COOKIE_EXPIRES_IN = 18000000; // in milliseconds
   static readonly COOKIE_OPTIONS: CookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
+    // secure: true,
     maxAge: Constant.COOKIE_EXPIRES_IN,
+    domain: process.env.COOKIE_DOMAIN,
   };
   constructor(private readonly configService: ConfigService) {}
 }

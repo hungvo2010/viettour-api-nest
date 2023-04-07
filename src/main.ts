@@ -15,7 +15,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter(), new CommonExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
-    origin: process.env.ALLLOWED_CROSS_ORIGIN,
+    origin: process.env.ALLLOWED_CROSS_ORIGIN.split(', '),
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
