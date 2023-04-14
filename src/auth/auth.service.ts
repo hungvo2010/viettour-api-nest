@@ -16,13 +16,6 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
-  async handleGoogleLogin(user: any) {
-    return this.usersService.upsert({
-      email: user.email,
-      fullname: user.name,
-      avatarUrl: user.picture,
-    });
-  }
   private readonly logger = new Logger(AuthService.name);
   constructor(
     private usersService: UsersService,
@@ -54,6 +47,14 @@ export class AuthService {
       data: {
         password: hashedPassword,
       },
+    });
+  }
+
+  async handleGoogleLogin(user: any) {
+    return this.usersService.upsert({
+      email: user.email,
+      fullname: user.name,
+      avatarUrl: user.picture,
     });
   }
 

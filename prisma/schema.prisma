@@ -32,7 +32,7 @@ model Tour {
   address             Address?
   description         String        @default("")
   socialImage         String        @default("")
-  category            TourCategory  @default(REAL_ESTATE)
+  category            TourCategory  @default(NOT_SET)
   creator             Creator
   logoUrl             String        @default("https://www.kindpng.com/picc/m/286-2864921_blender-logo-blender-3d-logo-hd-png-download.png")
   privacyStatus       PrivacyStatus @default(DRAFT)
@@ -62,7 +62,7 @@ type EmbeddedTour {
   address     Address?
   description String?       @default("")
   socialImage String?       @default("")
-  category    TourCategory? @default(REAL_ESTATE)
+  category    TourCategory? @default(NOT_SET)
   createdAt   DateTime?     @default(now())
   modifiedAt  DateTime?     @default(now())
 }
@@ -84,8 +84,8 @@ model Scene {
   dateModified     DateTime    @default(now())
   dimensions       Dimension
   type             String      @default("image/png")
-  previousHotspot  Hotspot[]   @relation("Next Scene")
-  containHotspot   Hotspot[]   @relation("Contain Scene")
+  previousHotspots Hotspot[]   @relation("Next Scene")
+  containHotspots  Hotspot[]   @relation("Contain Scene")
   tours            SceneTour[]
 }
 
@@ -105,11 +105,12 @@ model Hotspot {
   x              Float                 @default(0.0)
   y              Float                 @default(0.0)
   z              Float                 @default(0.0)
-  title          String
-  description    String
-  link           String
-  imageUrl       String
-  soundUrl       String
+  title          String?
+  description    String?
+  link           String?
+  imageUrl       String?
+  soundUrl       String?
+  type           HotspotType           @default(INFO)
   hotspotStyle   EmbeddedHotspotStyle?
   transitionType TransitionType?
   containScene   Scene?                @relation("Contain Scene", fields: [containSceneId], references: [id])
@@ -171,6 +172,12 @@ enum TourCategory {
   BUSINESS_COMPANIES_INDUSTRIES
   SCHOOL_COLLEGES_EDUCATION
   OTHER
+  NOT_SET
+}
+
+enum HotspotType {
+  INFO
+  TRANSITION
 }
 
 enum PrivacyStatus {
