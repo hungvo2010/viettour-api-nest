@@ -47,12 +47,12 @@ model Tour {
 }
 
 type Creator {
-  userId       String
-  fullname     String
-  avatarUrl    String
+  userId       String?
+  fullname     String?
+  avatarUrl    String?
   address      Address?
-  description  String
-  userCategory UserCategory
+  description  String?
+  userCategory UserCategory?
   phoneNumber  String?
 }
 
@@ -125,8 +125,9 @@ type EmbeddedHotspotStyle {
 }
 
 model HotspotStyle {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
   styleUrl String
+  creator  Creator?
 }
 
 type FloorPlan {
