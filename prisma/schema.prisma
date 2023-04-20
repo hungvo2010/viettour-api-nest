@@ -34,7 +34,7 @@ model Tour {
   socialImage         String        @default("")
   category            TourCategory  @default(NOT_SET)
   creator             Creator
-  logoUrl             String        @default("https://www.kindpng.com/picc/m/286-2864921_blender-logo-blender-3d-logo-hd-png-download.png")
+  logoUrl             String?
   privacyStatus       PrivacyStatus @default(DRAFT)
   likeCount           Int           @default(0)
   viewCount           Int           @default(0)
@@ -125,8 +125,9 @@ type EmbeddedHotspotStyle {
 }
 
 model HotspotStyle {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  id       String      @id @default(auto()) @map("_id") @db.ObjectId
   styleUrl String
+  type     HotspotType
   creator  Creator?
 }
 

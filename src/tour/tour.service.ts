@@ -18,11 +18,7 @@ export class TourService {
           include: {
             scene: {
               include: {
-                containHotspots: {
-                  include: {
-                    nextScene: true,
-                  },
-                },
+                containHotspots: true,
               },
             },
           },
