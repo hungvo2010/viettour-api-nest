@@ -40,8 +40,13 @@ model Tour {
   viewCount           Int           @default(0)
   isPasswordProtected Boolean       @default(false)
   password            String?
+  enableAutoRotate    Boolean       @default(false)
+  autoRotateSpeed     Float         @default(0.0)
   createdAt           DateTime      @default(now())
   modifiedAt          DateTime      @default(now())
+  autoHideInfospot    Boolean       @default(false)
+  autoHideShareButton Boolean       @default(false)
+  lockHorizontalView  Boolean       @default(false)
   floorPlan           FloorPlan?
   scenes              SceneTour[]
 }
@@ -75,11 +80,9 @@ model Scene {
   is2D             Boolean     @default(false)
   thumbnailUrl     String?
   hotspotUrl       String?
-  enableAutoRotate Boolean     @default(false)
-  rotateSpeed      Float       @default(0.0)
   arrivalX         Float       @default(0.0)
   arrivalY         Float       @default(0.0)
-  arrivalZ         Float       @default(0.0)
+  arrivalZ         Float       @default(1)
   dateUploaded     DateTime    @default(now())
   dateModified     DateTime    @default(now())
   dimensions       Dimension
@@ -91,9 +94,9 @@ model Scene {
 
 model SceneTour {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
-  scene   Scene  @relation(fields: [sceneId], references: [id])
+  scene   Scene  @relation(fields: [sceneId], references: [id], onDelete: Cascade)
   sceneId String @db.ObjectId
-  tour    Tour   @relation(fields: [tourId], references: [id])
+  tour    Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
   tourId  String @db.ObjectId
   order   Int
 }
@@ -102,6 +105,7 @@ model Hotspot {
   id             String                @id @default(auto()) @map("_id") @db.ObjectId
   scale          Float                 @default(1.0)
   opacity        Float                 @default(1.0)
+  rotateDegree   Float                 @default(0.0)
   x              Float                 @default(0.0)
   y              Float                 @default(0.0)
   z              Float                 @default(0.0)
@@ -113,7 +117,7 @@ model Hotspot {
   type           HotspotType           @default(INFO)
   hotspotStyle   EmbeddedHotspotStyle?
   transitionType TransitionType?
-  containScene   Scene?                @relation("Contain Scene", fields: [containSceneId], references: [id])
+  containScene   Scene?                @relation("Contain Scene", fields: [containSceneId], references: [id], onDelete: Cascade)
   containSceneId String?               @db.ObjectId
   nextScene      Scene?                @relation("Next Scene", fields: [nextSceneId], references: [id])
   nextSceneId    String?               @db.ObjectId
@@ -122,6 +126,8 @@ model Hotspot {
 type EmbeddedHotspotStyle {
   id       String
   styleUrl String
+  creator  Creator?
+  type     HotspotType?
 }
 
 model HotspotStyle {
