@@ -38,6 +38,7 @@ model Tour {
   privacyStatus       PrivacyStatus @default(DRAFT)
   likeCount           Int           @default(0)
   viewCount           Int           @default(0)
+  encodeUrl           String?       @unique
   isPasswordProtected Boolean       @default(false)
   password            String?
   enableAutoRotate    Boolean       @default(false)

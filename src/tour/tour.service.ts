@@ -1,7 +1,5 @@
 import { PrismaService } from './../prisma.service';
 import { Injectable } from '@nestjs/common';
-import { CreateTourDto } from './dto/create-tour.dto';
-import { UpdateTourDto } from './dto/update-tour.dto';
 import { Tour } from '@prisma/client';
 
 @Injectable()
@@ -23,6 +21,15 @@ export class TourService {
             },
           },
         },
+      },
+    });
+    return vrTour;
+  }
+
+  async findByEncodeUrl(encodeUrl: string) {
+    const vrTour = await this.prismaService.tour.findUnique({
+      where: {
+        encodeUrl: encodeUrl,
       },
     });
     return vrTour;
