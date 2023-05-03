@@ -26,10 +26,10 @@ export class TourService {
     return vrTour;
   }
 
-  async findByEncodeUrl(encodeUrl: string) {
+  async findByEncodeUrl(encodeUrl: string): Promise<Tour | undefined> {
     const vrTour = await this.prismaService.tour.findUnique({
       where: {
-        encodeUrl: encodeUrl,
+        encodeUrl,
       },
     });
     return vrTour;
