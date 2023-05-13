@@ -1,10 +1,11 @@
 import { PrismaService } from './../prisma.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Tour } from '@prisma/client';
 
 @Injectable()
 export class TourService {
   constructor(private readonly prismaService: PrismaService) {}
+  private readonly logger = new Logger(TourService.name);
 
   async findOne(tourId: string): Promise<Tour | undefined> {
     const vrTour = await this.prismaService.tour.findUnique({
@@ -27,9 +28,10 @@ export class TourService {
   }
 
   async findByEncodeUrl(encodeUrl: string): Promise<Tour | undefined> {
+    const url = encodeURI(encodeUrl);
     const vrTour = await this.prismaService.tour.findUnique({
       where: {
-        encodeUrl,
+        encodeUrl: url,
       },
     });
     return vrTour;
