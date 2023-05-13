@@ -34,7 +34,7 @@ export class UsersController {
 
   @Get(':userId')
   async getUser(@Param('userId') userId: string) {
-    const user = await this.usersService.findByUserId(userId);
+    const user = await this.usersService.findByUserIdIncludeTours(userId);
     const { password, ...returnData } = user;
     return {
       item: returnData,

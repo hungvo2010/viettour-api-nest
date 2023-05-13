@@ -63,7 +63,7 @@ type Creator {
 }
 
 type EmbeddedTour {
-  tourId      String?
+  id          String?
   name        String?
   address     Address?
   description String?       @default("")

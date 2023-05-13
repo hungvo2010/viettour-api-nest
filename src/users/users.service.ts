@@ -1,3 +1,4 @@
+import { TourService } from './../tour/tour.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,13 +9,16 @@ import { PrismaService } from 'src/prisma.service';
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private tourService: TourService,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     const data: Prisma.UserCreateInput = {
       ...createUserDto,
     };
-    return this.prisma.user.create({
+    return this.prismaService.user.create({
       data,
     });
   }
@@ -38,7 +42,7 @@ export class UsersService {
     const data: Prisma.UserCreateInput = {
       ...user,
     };
-    return await this.prisma.user.upsert({
+    return await this.prismaService.user.upsert({
       where: {
         email: user.email,
       },
@@ -54,13 +58,13 @@ export class UsersService {
     const where: Prisma.UserWhereUniqueInput = {
       id,
     };
-    return this.prisma.user.delete({
+    return this.prismaService.user.delete({
       where,
     });
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    return this.prisma.user.findUnique({
+    return this.prismaService.user.findUnique({
       where: {
         email,
       },
@@ -68,13 +72,17 @@ export class UsersService {
   }
 
   async findByUserId(userId: string): Promise<User | undefined> {
-    return this.prisma.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         id: userId,
       },
-      include: {
-        tours: true,
-      },
     });
+    return user;
+  }
+
+  async findByUserIdIncludeTours(userId: string): Promise<User | undefined> {
+    const user = await this.findByUserId(userId);
+    user.tours = await this.tourService.findByCreator(userId);
+    return user;
   }
 }
