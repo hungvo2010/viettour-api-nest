@@ -140,13 +140,14 @@ model HotspotStyle {
 
 type FloorPlan {
   floorPlanUrl String
-  dimensions   Dimension
+  name         String?
   points       Point[]
 }
 
 type Point {
-  x       Int
-  y       Int
+  x       Float
+  y       Float
+  title   String
   sceneId String
 }
 
