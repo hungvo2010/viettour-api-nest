@@ -1,9 +1,10 @@
 import { TourService } from './../tour/tour.service';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, CACHE_MANAGER } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +13,7 @@ export class UsersService {
   constructor(
     private prismaService: PrismaService,
     private tourService: TourService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(createUserDto: CreateUserDto) {

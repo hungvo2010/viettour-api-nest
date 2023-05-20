@@ -14,5 +14,6 @@ export class Constant {
     domain: process.env.COOKIE_DOMAIN,
     sameSite: 'none',
   };
+  static readonly REDIS_PORT: number = 6379;
   constructor(private readonly configService: ConfigService) {}
 }
