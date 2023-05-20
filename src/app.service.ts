@@ -7,6 +7,7 @@ export class AppService {
   private readonly logger = new Logger(AppService.name);
   getHello(): string {
     this.logger.log(process.env.JWT_SECRET);
+    this.logger.log(process.env.REDIS_HOST);
     return 'Hello World!';
   }
 }
