@@ -6,7 +6,7 @@ export class AppService {
   constructor(private configService: ConfigService) {}
   private readonly logger = new Logger(AppService.name);
   getHello(): string {
-    this.logger.log(process.env.COOKIE_DOMAIN);
+    this.logger.log(process.env.JWT_SECRET);
     return 'Hello World!';
   }
 }
