@@ -26,9 +26,9 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
         socket: {
           host: configService.get('REDIS_HOST'),
           port: configService.get('REDIS_PORT'),
-          username: configService.get('REDIS_USERNAME'),
-          password: configService.get('REDIS_PASSWORD'),
         },
+        username: configService.get('REDIS_USERNAME'),
+        password: configService.get('REDIS_PASSWORD'),
       }),
     }),
   ],
