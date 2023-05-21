@@ -1,3 +1,4 @@
+import { Constant } from 'src/constant';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -34,6 +35,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
         },
         username: configService.get('REDIS_USERNAME'),
         password: configService.get('REDIS_PASSWORD'),
+        ttl: Constant.REDIS_TTL,
       }),
     }),
   ],

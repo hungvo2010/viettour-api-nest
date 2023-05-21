@@ -15,5 +15,6 @@ export class Constant {
     sameSite: 'none',
   };
   static readonly REDIS_PORT: number = 6379;
+  static readonly REDIS_TTL: number = 60 * 60 * 24 * 7;
   constructor(private readonly configService: ConfigService) {}
 }
