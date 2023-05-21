@@ -37,7 +37,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
         });
         return {
           store: store as unknown as CacheStore,
-          ttl: 60 * 60 * 24 * 7,
+          ttl: 60 * 60 * 24 * 7 * 1000,
         };
       },
     }),
