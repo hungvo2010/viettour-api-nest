@@ -10,8 +10,8 @@ import {
   CacheModule,
   CacheStore,
 } from '@nestjs/cache-manager';
-// import { redisStore } from 'cache-manager-redis-yet';
-import { redisStore } from 'cache-manager-redis-store';
+import { redisStore } from 'cache-manager-redis-yet';
+// import { redisStore } from 'cache-manager-redis-store';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
