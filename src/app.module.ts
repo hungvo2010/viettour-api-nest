@@ -5,8 +5,13 @@ import { UsersModule } from './users/users.module';
 import { TourModule } from './tour/tour.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-yet';
+import {
+  CacheInterceptor,
+  CacheModule,
+  CacheStore,
+} from '@nestjs/cache-manager';
+// import { redisStore } from 'cache-manager-redis-yet';
+import { redisStore } from 'cache-manager-redis-store';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
@@ -21,15 +26,20 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
-        socket: {
-          host: configService.get('REDIS_HOST'),
-          port: configService.get('REDIS_PORT'),
-        },
-        username: configService.get('REDIS_USERNAME'),
-        password: configService.get('REDIS_PASSWORD'),
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const store = await redisStore({
+          socket: {
+            host: configService.get('REDIS_HOST'),
+            port: configService.get('REDIS_PORT'),
+          },
+          username: configService.get('REDIS_USERNAME'),
+          password: configService.get('REDIS_PASSWORD'),
+        });
+        return {
+          store: store as unknown as CacheStore,
+          ttl: 60 * 60 * 24 * 7,
+        };
+      },
     }),
   ],
   controllers: [AppController],
