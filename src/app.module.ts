@@ -26,21 +26,15 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
-        const store = await redisStore({
-          socket: {
-            host: configService.get('REDIS_HOST'),
-            port: +configService.get('REDIS_PORT'),
-          },
-          // url: configService.get('REDIS_URL'),
+      useFactory: async (configService: ConfigService) => ({
+        store: redisStore,
+        socket: {
+          host: configService.get('REDIS_HOST'),
+          port: configService.get('REDIS_PORT'),
           username: configService.get('REDIS_USERNAME'),
           password: configService.get('REDIS_PASSWORD'),
-        });
-        return {
-          store,
-          ttl: 60 * 60 * 24 * 7 * 1000,
-        };
-      },
+        },
+      }),
     }),
   ],
   controllers: [AppController],
