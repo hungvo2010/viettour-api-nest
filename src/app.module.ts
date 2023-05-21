@@ -37,7 +37,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
           password: configService.get('REDIS_PASSWORD'),
         });
         return {
-          store: store as unknown as CacheStore,
+          store,
           ttl: 60 * 60 * 24 * 7 * 1000,
         };
       },
