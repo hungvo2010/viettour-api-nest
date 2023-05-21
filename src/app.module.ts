@@ -10,7 +10,7 @@ import {
   CacheModule,
   CacheStore,
 } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-yet';
+import { redisStore } from 'cache-manager-redis-store';
 // import { redisStore } from 'cache-manager-redis-store';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
@@ -27,13 +27,13 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       isGlobal: true,
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
+        store: redisStore as unknown as CacheStore,
         socket: {
           host: configService.get('REDIS_HOST'),
           port: configService.get('REDIS_PORT'),
-          username: configService.get('REDIS_USERNAME'),
-          password: configService.get('REDIS_PASSWORD'),
         },
+        username: configService.get('REDIS_USERNAME'),
+        password: configService.get('REDIS_PASSWORD'),
       }),
     }),
   ],
