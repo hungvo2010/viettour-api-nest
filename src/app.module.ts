@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TourModule } from './tour/tour.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
@@ -18,13 +18,18 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       isGlobal: true,
     }),
     AuthModule,
-    CacheModule.register({
+    CacheModule.registerAsync({
       isGlobal: true,
-      store: redisStore,
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT,
-      username: process.env.REDIS_USERNAME,
-      password: process.env.REDIS_PASSWORD,
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        store: redisStore,
+        socket: {
+          host: configService.get('REDIS_HOST'),
+          port: configService.get('REDIS_PORT'),
+          username: configService.get('REDIS_USERNAME'),
+          password: configService.get('REDIS_PASSWORD'),
+        },
+      }),
     }),
   ],
   controllers: [AppController],
