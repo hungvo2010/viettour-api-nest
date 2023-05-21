@@ -1,4 +1,3 @@
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Controller,
   Get,
@@ -10,6 +9,7 @@ import {
   Logger,
   UseInterceptors,
 } from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';

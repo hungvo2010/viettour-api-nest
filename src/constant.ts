@@ -16,5 +16,10 @@ export class Constant {
   };
   static readonly REDIS_PORT: number = 6379;
   static readonly REDIS_TTL: number = 60 * 60 * 24 * 7;
+
+  static readonly CACHE_KEY_USERID: string = 'userId';
+  static readonly CACHE_KEY_TOUR: string = 'tour';
+  static readonly CACHE_KEY_CREATOR: string = 'creator';
+  static readonly CACHE_KEY_ENCODEURL: string = 'encodeUrl';
   constructor(private readonly configService: ConfigService) {}
 }

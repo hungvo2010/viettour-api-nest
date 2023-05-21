@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Cache } from 'cache-manager';
+import { Constant } from 'src/constant';
 
 @Injectable()
 export class UsersService {
@@ -74,11 +75,15 @@ export class UsersService {
   }
 
   async findByUserId(userId: string): Promise<User | undefined> {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    let user: User;
+    user = await this.cacheManager.get(Constant.CACHE_KEY_USERID + userId);
+    if (!user) {
+      user = await this.prismaService.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+    }
     return user;
   }
 
