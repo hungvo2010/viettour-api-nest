@@ -1,3 +1,4 @@
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Controller,
   Get,
@@ -7,6 +8,7 @@ import {
   Param,
   UseGuards,
   Logger,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -30,6 +32,7 @@ export class UsersController {
   }
 
   @Get(':userId')
+  @UseInterceptors(CacheInterceptor)
   async getUser(@Param('userId') userId: string) {
     const user = await this.usersService.findByUserIdIncludeTours(userId);
     const { password, ...returnData } = user;
