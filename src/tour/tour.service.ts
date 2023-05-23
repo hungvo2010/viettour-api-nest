@@ -29,9 +29,13 @@ export class TourService {
                 },
               },
             },
+            orderBy: {
+              order: 'asc',
+            },
           },
         },
       });
+      await this.cacheManager.set(Constant.CACHE_KEY_TOUR + tourId, tour);
     }
     return tour;
   }
@@ -46,6 +50,7 @@ export class TourService {
           encodeUrl: url,
         },
       });
+      await this.cacheManager.set(Constant.CACHE_KEY_ENCODEURL + url, tour);
     }
     return tour;
   }
@@ -74,6 +79,7 @@ export class TourService {
           encodeUrl: true,
         },
       });
+      await this.cacheManager.set(Constant.CACHE_KEY_CREATOR + userId, tours);
     }
     return tours;
   }

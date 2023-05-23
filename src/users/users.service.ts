@@ -83,6 +83,7 @@ export class UsersService {
           id: userId,
         },
       });
+      await this.cacheManager.set(Constant.CACHE_KEY_USERID + userId, user);
     }
     return user;
   }
