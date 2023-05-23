@@ -35,7 +35,8 @@ model Tour {
   category            TourCategory  @default(NOT_SET)
   creator             Creator
   logoUrl             String?
-  privacyStatus       PrivacyStatus @default(DRAFT)
+  privacyStatus       PrivacyStatus @default(PUBLIC)
+  editStatus          EditStatus    @default(DRAFT)
   likeCount           Int           @default(0)
   viewCount           Int           @default(0)
   encodeUrl           String?       @unique
@@ -193,6 +194,11 @@ enum HotspotType {
 enum PrivacyStatus {
   PUBLIC
   PRIVATE
+  PASSWORD
+}
+
+enum EditStatus {
+  PUBLISHED
   DRAFT
 }
 
