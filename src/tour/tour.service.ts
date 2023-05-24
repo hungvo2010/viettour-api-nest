@@ -2,7 +2,7 @@ import { Constant } from 'src/constant';
 import { PrismaService } from './../prisma.service';
 import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { EmbeddedTour, Tour } from '@prisma/client';
+import { EmbeddedTour, Tour, PrivacyStatus } from '@prisma/client';
 
 @Injectable()
 export class TourService {
@@ -16,9 +16,10 @@ export class TourService {
     let tour: Tour;
     tour = await this.cacheManager.get(Constant.CACHE_KEY_TOUR + tourId);
     if (!tour) {
-      tour = await this.prismaService.tour.findUnique({
+      tour = await this.prismaService.tour.findFirst({
         where: {
           id: tourId,
+          privacyStatus: PrivacyStatus.PUBLIC,
         },
         include: {
           scenes: {
@@ -45,9 +46,10 @@ export class TourService {
     let tour: Tour;
     tour = await this.cacheManager.get(Constant.CACHE_KEY_ENCODEURL + url);
     if (!tour) {
-      tour = await this.prismaService.tour.findUnique({
+      tour = await this.prismaService.tour.findFirst({
         where: {
           encodeUrl: url,
+          privacyStatus: PrivacyStatus.PUBLIC,
         },
       });
       await this.cacheManager.set(Constant.CACHE_KEY_ENCODEURL + url, tour);
@@ -66,6 +68,7 @@ export class TourService {
               userId,
             },
           },
+          privacyStatus: PrivacyStatus.PUBLIC,
         },
         select: {
           id: true,
