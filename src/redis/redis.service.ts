@@ -1,6 +1,5 @@
 import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { EditStatus, Tour } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Constant } from 'src/constant';
 
