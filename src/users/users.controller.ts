@@ -1,24 +1,24 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Request,
   Param,
   UseGuards,
   Logger,
+  Patch,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @Controller('/v1.0/users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   private readonly logger = new Logger(UsersController.name);
 
   @Get('/')
-  @UseGuards(JwtAuthGuard)
   async getProfile(@Request() req) {
     this.logger.log('user: ' + JSON.stringify(req.user));
     const user = await this.usersService.getProfile(req.user);
@@ -39,26 +39,16 @@ export class UsersController {
     };
   }
 
-  @Post(':userId')
-  update(
+  @Patch(':userId')
+  async update(
     @Param('userId') userId: string,
     @Body() updateUserDto: UpdateUserDto,
+    @Request() req,
   ) {
-    return this.usersService.update(userId, updateUserDto);
+    await this.usersService.update(userId, req.user.userId, updateUserDto);
+    return {
+      message: 'Update user successfully',
+      timestamp: new Date().toISOString(),
+    };
   }
-
-  // @Post()
-  // create(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.create(createUserDto);
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.usersService.findByEmail(id);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.delete(+id);
-  // }
 }

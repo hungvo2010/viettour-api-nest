@@ -51,7 +51,7 @@ export class AuthService {
   }
 
   async handleGoogleLogin(user: any) {
-    return this.usersService.upsert({
+    return this.usersService.updateOrCreate({
       email: user.email,
       fullname: user.name,
       avatarUrl: user.picture,

@@ -1,5 +1,11 @@
 import { TourService } from './../tour/tour.service';
-import { Injectable, Logger, Inject, CACHE_MANAGER } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  Inject,
+  CACHE_MANAGER,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
@@ -32,16 +38,21 @@ export class UsersService {
     return this.findByUserId(user.userId);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async update(
+    needUpdateUserId: string,
+    initReqUserId: string,
+    { email, password, ...updateUserDto }: UpdateUserDto,
+  ) {
+    await this.checkUserPermission(initReqUserId, needUpdateUserId);
+    await this.prismaService.user.update({
+      where: {
+        id: needUpdateUserId,
+      },
+      data: updateUserDto,
+    });
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    // return `This action updates a #${id} user`;
-    return '';
-  }
-
-  async upsert(user: any) {
+  async updateOrCreate(user: any) {
     const data: Prisma.UserCreateInput = {
       ...user,
     };
@@ -92,5 +103,11 @@ export class UsersService {
     const user = await this.findByUserId(userId);
     user.tours = await this.tourService.findByCreator(userId);
     return user;
+  }
+
+  async checkUserPermission(initReqUserId: string, needUpdateUserId: string) {
+    if (initReqUserId !== needUpdateUserId) {
+      throw new ForbiddenException('Forbidden');
+    }
   }
 }
