@@ -43,6 +43,10 @@ export class UsersService {
     initReqUserId: string,
     { email, password, ...updateUserDto }: UpdateUserDto,
   ) {
+    this.logger.log(
+      'needUpdateUserId: ' + needUpdateUserId,
+      'initReqUserId: ' + initReqUserId,
+    );
     await this.checkUserPermission(initReqUserId, needUpdateUserId);
     await this.prismaService.user.update({
       where: {
