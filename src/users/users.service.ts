@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma, User } from '@prisma/client';
+import { Prisma, User, EmbeddedTour } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Cache } from 'cache-manager';
 import { Constant } from 'src/constant';
@@ -90,23 +90,23 @@ export class UsersService {
   }
 
   async findByUserId(userId: string): Promise<User | undefined> {
-    let user: User;
-    user = await this.cacheManager.get(Constant.CACHE_KEY_USERID + userId);
-    if (!user) {
-      user = await this.prismaService.user.findUnique({
-        where: {
-          id: userId,
-        },
-      });
-      await this.cacheManager.set(Constant.CACHE_KEY_USERID + userId, user);
-    }
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
     return user;
   }
 
   async findByUserIdIncludeTours(userId: string): Promise<User | undefined> {
     const user = await this.findByUserId(userId);
-    user.tours = await this.tourService.findByCreator(userId);
+    user.tours = await this.getUserTours(userId);
     return user;
+  }
+
+  async getUserTours(userId: string): Promise<EmbeddedTour[]> {
+    const tours = await this.tourService.findByCreator(userId);
+    return tours;
   }
 
   async checkUserPermission(initReqUserId: string, needUpdateUserId: string) {

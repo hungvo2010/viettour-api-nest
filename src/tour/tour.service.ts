@@ -43,6 +43,7 @@ export class TourService {
 
   async findByEncodeUrl(encodeUrl: string): Promise<Tour | undefined> {
     const url = encodeURI(encodeUrl);
+    this.logger.log(`findByEncodeUrl: ${url}`);
     let tour: Tour;
     tour = await this.cacheManager.get(Constant.CACHE_KEY_ENCODEURL + url);
     if (!tour) {

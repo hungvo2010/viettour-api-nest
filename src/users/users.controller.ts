@@ -31,10 +31,19 @@ export class UsersController {
 
   @Get(':userId')
   async getUser(@Param('userId') userId: string) {
-    const user = await this.usersService.findByUserIdIncludeTours(userId);
+    const user = await this.usersService.findByUserId(userId);
     const { password, ...returnData } = user;
     return {
       item: returnData,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Get(':userId/tours')
+  async getUserTours(@Param('userId') userId: string) {
+    const tours = await this.usersService.getUserTours(userId);
+    return {
+      item: tours,
       timestamp: new Date().toISOString(),
     };
   }
