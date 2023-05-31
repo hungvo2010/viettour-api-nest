@@ -42,6 +42,7 @@ model Tour {
   encodeUrl           String?       @unique
   isPasswordProtected Boolean       @default(false)
   password            String?
+  textColor           String?       @default("#fff")
   enableAutoRotate    Boolean       @default(false)
   autoRotateSpeed     Float         @default(0.0)
   createdAt           DateTime      @default(now())
