@@ -1,4 +1,14 @@
-import { Controller, Get, Logger, Param, Query } from '@nestjs/common';
+import { JwtAuthGuard } from './../../guards/jwt-auth.guard';
+import {
+  Controller,
+  Delete,
+  Get,
+  Logger,
+  Param,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { TourService } from '../tour.service';
 
 @Controller('/v1.0/tours/')
@@ -20,6 +30,17 @@ export class TourViewerController {
     const vrTour = await this.tourService.findByEncodeUrl(encodeUrl);
     return {
       item: vrTour,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async deleteTour(@Param('id') tourId: string, @Req() req) {
+    this.logger.log(tourId);
+    await this.tourService.deleteTour(tourId, req.user);
+    return {
+      message: 'Deleted tour successfully',
       timestamp: new Date().toISOString(),
     };
   }

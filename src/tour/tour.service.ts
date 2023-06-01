@@ -1,6 +1,13 @@
 import { Constant } from 'src/constant';
 import { PrismaService } from './../prisma.service';
-import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { EmbeddedTour, Tour, PrivacyStatus } from '@prisma/client';
 
@@ -88,5 +95,25 @@ export class TourService {
       await this.cacheManager.set(Constant.CACHE_KEY_CREATOR + userId, tours);
     }
     return tours;
+  }
+
+  async deleteTour(tourId: string, { userId }) {
+    await this.checkUserPermission(userId, tourId);
+    await this.prismaService.tour.delete({
+      where: {
+        id: tourId,
+      },
+    });
+  }
+
+  async checkUserPermission(userId: string, tourId: string) {
+    const tour = await this.prismaService.tour.findUnique({
+      where: {
+        id: tourId,
+      },
+    });
+    if (!tour) throw new NotFoundException('Tour not found');
+    if (tour?.creator?.userId !== userId)
+      throw new ForbiddenException('Wrong permission');
   }
 }

@@ -11,7 +11,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User, EmbeddedTour } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Cache } from 'cache-manager';
-import { Constant } from 'src/constant';
 
 @Injectable()
 export class UsersService {
