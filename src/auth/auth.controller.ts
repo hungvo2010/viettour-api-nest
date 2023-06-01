@@ -17,7 +17,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { Response } from 'express';
-import { Constant } from 'src/constant';
+import { Constant } from 'src/common/constant';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 

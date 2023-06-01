@@ -1,7 +1,7 @@
 import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { PrismaService } from 'src/prisma.service';
-import { Constant } from 'src/constant';
+import { Constant } from 'src/common/constant';
 
 @Injectable()
 export class RedisService {

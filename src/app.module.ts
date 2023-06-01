@@ -1,4 +1,4 @@
-import { Constant } from 'src/constant';
+import { Constant } from 'src/common/constant';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';

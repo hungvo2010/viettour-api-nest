@@ -10,11 +10,21 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { TourService } from '../tour.service';
+import { GetTourDto } from '../dto/get-tour.dto';
 
 @Controller('/v1.0/tours/')
 export class TourViewerController {
   constructor(private readonly tourService: TourService) {}
   private readonly logger = new Logger(TourViewerController.name);
+
+  @Get('all')
+  async getAllTours(@Query() queryDto: GetTourDto) {
+    const tours = await this.tourService.getAllTours(queryDto);
+    return {
+      values: tours,
+      timestamp: new Date().toISOString(),
+    };
+  }
 
   @Get(':id')
   async getTour(@Param('id') tourId: string) {

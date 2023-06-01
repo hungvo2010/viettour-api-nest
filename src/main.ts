@@ -2,7 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma.service';
 import { HttpExceptionFilter } from './filter/http-exception.filter';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  INestApplication,
+  ValidationPipe,
+} from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { CommonExceptionFilter } from './filter/common-exception.filter';
 
@@ -26,7 +30,22 @@ async function bootstrap() {
 
 function configureApp(app: INestApplication) {
   app.useGlobalFilters(new HttpExceptionFilter(), new CommonExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      enableDebugMessages: true,
+      exceptionFactory: (errors) => {
+        const errorMessages = {};
+        errors.forEach((error) => {
+          errorMessages[error.property] = Object.values(error.constraints)
+            .join('. ')
+            .trim();
+        });
+        return new BadRequestException(errorMessages);
+      },
+    }),
+  );
   app.enableCors({
     origin: process.env.ALLLOWED_CROSS_ORIGIN.split(', '),
     credentials: true,

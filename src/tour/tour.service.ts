@@ -1,4 +1,4 @@
-import { Constant } from 'src/constant';
+import { Constant } from 'src/common/constant';
 import { PrismaService } from './../prisma.service';
 import {
   CACHE_MANAGER,
@@ -18,6 +18,17 @@ export class TourService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
   private readonly logger = new Logger(TourService.name);
+
+  async getAllTours({ start, size }) {
+    return await this.prismaService.tour.findMany({
+      skip: start,
+      take: size,
+      where: {
+        // category,
+        privacyStatus: PrivacyStatus.PUBLIC,
+      },
+    });
+  }
 
   async findOne(tourId: string): Promise<Tour | undefined> {
     let tour: Tour;

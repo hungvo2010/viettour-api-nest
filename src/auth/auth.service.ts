@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { Constant } from 'src/constant';
+import { Constant } from 'src/common/constant';
 import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
