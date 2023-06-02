@@ -19,8 +19,9 @@ export class TourViewerController {
 
   @Get()
   async getAllTours(@Query() queryDto: GetTourDto) {
-    const tours = await this.tourService.getAllTours(queryDto);
+    const [total, tours] = await this.tourService.getAllTours(queryDto);
     return {
+      total,
       values: tours,
       timestamp: new Date().toISOString(),
     };

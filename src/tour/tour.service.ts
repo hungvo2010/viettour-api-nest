@@ -21,35 +21,43 @@ export class TourService {
 
   async getAllTours({ start, size, category }) {
     this.logger.log(`getAllTours: ${start}, ${size}, ${category}`);
-    return await this.prismaService.tour.findMany({
-      skip: start,
-      take: size,
-      select: {
-        name: true,
-        id: true,
-        encodeUrl: true,
-        privacyStatus: true,
-        category: true,
-        address: true,
-        description: true,
-        socialImage: true,
-        creator: {
-          select: {
-            userId: true,
-            fullname: true,
-            avatarUrl: true,
-            address: true,
-          },
+    return await this.prismaService.$transaction([
+      this.prismaService.tour.count({
+        where: {
+          category,
+          privacyStatus: PrivacyStatus.PUBLIC,
         },
-        likeCount: true,
-        viewCount: true,
-        createdAt: true,
-      },
-      where: {
-        category,
-        privacyStatus: PrivacyStatus.PUBLIC,
-      },
-    });
+      }),
+      this.prismaService.tour.findMany({
+        skip: start,
+        take: size,
+        select: {
+          name: true,
+          id: true,
+          encodeUrl: true,
+          privacyStatus: true,
+          category: true,
+          address: true,
+          description: true,
+          socialImage: true,
+          creator: {
+            select: {
+              userId: true,
+              fullname: true,
+              avatarUrl: true,
+              address: true,
+            },
+          },
+          likeCount: true,
+          viewCount: true,
+          createdAt: true,
+        },
+        where: {
+          category,
+          privacyStatus: PrivacyStatus.PUBLIC,
+        },
+      }),
+    ]);
   }
 
   async findOne(tourId: string): Promise<Tour | undefined> {
