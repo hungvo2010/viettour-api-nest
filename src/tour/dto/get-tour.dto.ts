@@ -1,12 +1,16 @@
-import { IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class GetTourDto {
   @IsNumber()
-  start: number;
+  @Type(() => Number)
+  start = 0;
 
   @IsNumber()
-  size: number;
+  @Type(() => Number)
+  size = 10;
 
-  //   @IsOptional()
-  //   public category: string;
+  @IsString()
+  @IsOptional()
+  public category: string;
 }

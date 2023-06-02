@@ -19,12 +19,34 @@ export class TourService {
   ) {}
   private readonly logger = new Logger(TourService.name);
 
-  async getAllTours({ start, size }) {
+  async getAllTours({ start, size, category }) {
+    this.logger.log(`getAllTours: ${start}, ${size}, ${category}`);
     return await this.prismaService.tour.findMany({
       skip: start,
       take: size,
+      select: {
+        name: true,
+        id: true,
+        encodeUrl: true,
+        privacyStatus: true,
+        category: true,
+        address: true,
+        description: true,
+        socialImage: true,
+        creator: {
+          select: {
+            userId: true,
+            fullname: true,
+            avatarUrl: true,
+            address: true,
+          },
+        },
+        likeCount: true,
+        viewCount: true,
+        createdAt: true,
+      },
       where: {
-        // category,
+        category,
         privacyStatus: PrivacyStatus.PUBLIC,
       },
     });
