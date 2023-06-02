@@ -95,13 +95,14 @@ export class TourService {
     let tour: Tour;
     tour = await this.cacheManager.get(Constant.CACHE_KEY_ENCODEURL + url);
     if (!tour) {
-      tour = await this.prismaService.tour.findFirst({
+      tour = await this.prismaService.tour.findUnique({
         where: {
           encodeUrl: url,
-          privacyStatus: PrivacyStatus.PUBLIC,
         },
       });
-      await this.cacheManager.set(Constant.CACHE_KEY_ENCODEURL + url, tour);
+      tour = tour.privacyStatus === PrivacyStatus.PUBLIC ? tour : null;
+      if (tour)
+        await this.cacheManager.set(Constant.CACHE_KEY_ENCODEURL + url, tour);
     }
     return tour;
   }

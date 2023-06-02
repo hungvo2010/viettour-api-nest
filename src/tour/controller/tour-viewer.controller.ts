@@ -17,7 +17,7 @@ export class TourViewerController {
   constructor(private readonly tourService: TourService) {}
   private readonly logger = new Logger(TourViewerController.name);
 
-  @Get()
+  @Get('all')
   async getAllTours(@Query() queryDto: GetTourDto) {
     const [total, tours] = await this.tourService.getAllTours(queryDto);
     return {
