@@ -71,7 +71,7 @@ export class UsersService {
     });
   }
 
-  delete(id) {
+  delete(id: string) {
     const where: Prisma.UserWhereUniqueInput = {
       id,
     };

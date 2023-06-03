@@ -22,9 +22,9 @@ export class UsersController {
   async getProfile(@Request() req) {
     this.logger.log('user: ' + JSON.stringify(req.user));
     const user = await this.usersService.getProfile(req.user);
-    const { password, ...returnData } = user;
+    const { password, ...profile } = user;
     return {
-      item: returnData,
+      item: profile,
       timestamp: new Date().toISOString(),
     };
   }

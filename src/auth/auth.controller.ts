@@ -56,9 +56,9 @@ export class AuthController {
     response
       .status(HttpStatus.CREATED)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-    const { password, ...returnData } = user;
+    const { password, ...newUser } = user;
     response.json({
-      item: returnData,
+      item: newUser,
       timestamp: new Date().toISOString(),
     });
   }
