@@ -35,6 +35,7 @@ model Tour {
   category            TourCategory  @default(NOT_SET)
   creator             Creator
   logoUrl             String?
+  soundOption         String?       @default("No Sound")
   privacyStatus       PrivacyStatus @default(PUBLIC)
   editStatus          EditStatus    @default(DRAFT)
   likeCount           Int           @default(0)
@@ -79,7 +80,6 @@ model Scene {
   id               String      @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   imageUrl         String
-  soundUrl         String?
   is2D             Boolean     @default(false)
   thumbnailUrl     String?
   hotspotUrl       String?
@@ -88,7 +88,7 @@ model Scene {
   arrivalZ         Float       @default(1)
   dateUploaded     DateTime    @default(now())
   dateModified     DateTime    @default(now())
-  dimensions       Dimension
+  dimensions       Dimension?
   type             String      @default("image/png")
   previousHotspots Hotspot[]   @relation("Next Scene")
   containHotspots  Hotspot[]   @relation("Contain Scene")
@@ -102,6 +102,8 @@ model SceneTour {
   tour    Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
   tourId  String @db.ObjectId
   order   Int
+
+  @@unique([sceneId, tourId])
 }
 
 model Hotspot {
