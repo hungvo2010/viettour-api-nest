@@ -67,7 +67,14 @@ export class TourService {
       tour = await this.prismaService.tour.findFirst({
         where: {
           id: tourId,
-          privacyStatus: PrivacyStatus.PUBLIC,
+          OR: [
+            {
+              privacyStatus: PrivacyStatus.PUBLIC,
+            },
+            {
+              privacyStatus: PrivacyStatus.UNLISTED,
+            },
+          ],
         },
         include: {
           scenes: {
