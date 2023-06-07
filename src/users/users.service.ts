@@ -19,7 +19,6 @@ export class UsersService {
   constructor(
     private prismaService: PrismaService,
     private tourService: TourService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
