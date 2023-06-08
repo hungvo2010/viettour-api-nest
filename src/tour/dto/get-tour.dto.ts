@@ -1,5 +1,6 @@
+import { TourCategory } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsEnum } from 'class-validator';
 
 export class GetTourDto {
   @IsNumber()
@@ -10,7 +11,7 @@ export class GetTourDto {
   @Type(() => Number)
   size = 10;
 
-  @IsString()
+  @IsEnum(TourCategory)
   @IsOptional()
-  public category: string;
+  public category?: TourCategory;
 }

@@ -19,12 +19,12 @@ export class TourService {
   ) {}
   private readonly logger = new Logger(TourService.name);
 
-  async getAllTours({ start, size, category }) {
-    this.logger.log(`getAllTours: ${start}, ${size}, ${category}`);
+  async getAllTours({ start, size, ...queryParams }) {
+    this.logger.log(`getAllTours: ${start}, ${size}, ${queryParams.category}`);
     return await this.prismaService.$transaction([
       this.prismaService.tour.count({
         where: {
-          category,
+          category: queryParams.category,
           privacyStatus: PrivacyStatus.PUBLIC,
         },
       }),
@@ -53,7 +53,7 @@ export class TourService {
           createdAt: true,
         },
         where: {
-          category,
+          category: queryParams.category,
           privacyStatus: PrivacyStatus.PUBLIC,
         },
       }),
