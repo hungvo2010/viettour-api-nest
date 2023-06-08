@@ -13,6 +13,7 @@ describe('UsersService', () => {
   });
 
   it('should be defined', () => {
+    // console.log('test')
     expect(service).toBeDefined();
   });
 });
