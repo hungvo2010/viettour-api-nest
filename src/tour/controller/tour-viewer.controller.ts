@@ -1,10 +1,10 @@
 import { JwtAuthGuard } from './../../guards/jwt-auth.guard';
 import {
   Controller,
-  Delete,
   Get,
   Logger,
   Param,
+  Post,
   Query,
   Req,
   UseGuards,
@@ -46,7 +46,7 @@ export class TourViewerController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Post(':id')
   async deleteTour(@Param('id') tourId: string, @Req() req) {
     this.logger.log(tourId);
     await this.tourService.deleteTour(tourId, req.user);
