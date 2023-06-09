@@ -19,6 +19,7 @@ export class TourViewerController {
 
   @Get('all')
   async getAllTours(@Query() queryDto: GetTourDto) {
+    this.logger.log(`getAllTours: ${JSON.stringify(queryDto)}`);
     const [total, tours] = await this.tourService.getAllTours(queryDto);
     return {
       total,
@@ -29,6 +30,7 @@ export class TourViewerController {
 
   @Get(':id')
   async getTour(@Param('id') tourId: string) {
+    this.logger.log(`getTour: ${tourId}`);
     const vrTour = await this.tourService.findOne(tourId);
     return {
       item: vrTour,
@@ -38,6 +40,7 @@ export class TourViewerController {
 
   @Get()
   async getTourByEncodeUrl(@Query('encodeUrl') encodeUrl: string) {
+    this.logger.log('Get tour by encodeUrl: ' + encodeUrl);
     const vrTour = await this.tourService.findByEncodeUrl(encodeUrl);
     return {
       item: vrTour,
@@ -48,7 +51,7 @@ export class TourViewerController {
   @UseGuards(JwtAuthGuard)
   @Post(':id')
   async deleteTour(@Param('id') tourId: string, @Req() req) {
-    this.logger.log(tourId);
+    this.logger.log('Delete tour: ' + tourId);
     await this.tourService.deleteTour(tourId, req.user);
     return {
       message: 'Deleted tour successfully',
