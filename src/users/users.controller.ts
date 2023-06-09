@@ -43,7 +43,7 @@ export class UsersController {
   async getUserTours(@Param('userId') userId: string) {
     const tours = await this.usersService.getUserTours(userId);
     return {
-      item: tours,
+      values: tours,
       timestamp: new Date().toISOString(),
     };
   }
