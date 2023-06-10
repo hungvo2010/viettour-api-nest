@@ -13,12 +13,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @Controller('/v1.0/users')
-@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   private readonly logger = new Logger(UsersController.name);
 
   @Get('/')
+  @UseGuards(JwtAuthGuard)
   async getProfile(@Request() req) {
     this.logger.log('user: ' + JSON.stringify(req.user));
     const user = await this.usersService.getProfile(req.user);
@@ -49,6 +49,7 @@ export class UsersController {
   }
 
   @Patch(':userId')
+  @UseGuards(JwtAuthGuard)
   async update(
     @Param('userId') userId: string,
     @Body() updateUserDto: UpdateUserDto,
