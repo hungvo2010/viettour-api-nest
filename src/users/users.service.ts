@@ -39,12 +39,26 @@ export class UsersService {
       'initReqUserId: ' + initReqUserId,
     );
     await this.checkUserPermission(initReqUserId, needUpdateUserId);
-    await this.prismaService.user.update({
-      where: {
-        id: needUpdateUserId,
-      },
-      data: updateUserDto,
-    });
+    await this.prismaService.$transaction([
+      this.prismaService.user.update({
+        where: {
+          id: needUpdateUserId,
+        },
+        data: updateUserDto,
+      }),
+      this.prismaService.tour.updateMany({
+        where: {
+          creator: {
+            userId: needUpdateUserId,
+          },
+        },
+        data: {
+          creator: {
+            fullname: updateUserDto.fullname,
+          },
+        },
+      }),
+    ]);
   }
 
   async updateOrCreate(user: any) {
