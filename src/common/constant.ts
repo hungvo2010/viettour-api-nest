@@ -17,6 +17,7 @@ export class Constant {
   static readonly REDIS_PORT: number = 6379;
   static readonly REDIS_TTL: number = 60 * 60 * 24 * 7; // v4 cache-manager in seconds
 
+  static readonly CACHE_KEY_TOUR_EDITSTATUS: string = 'tourEditStatus';
   static readonly CACHE_KEY_USERID: string = 'userId';
   static readonly CACHE_KEY_TOUR: string = 'tour';
   static readonly CACHE_KEY_CREATOR: string = 'creator';
