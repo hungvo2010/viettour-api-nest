@@ -39,26 +39,38 @@ export class UsersService {
       'initReqUserId: ' + initReqUserId,
     );
     await this.checkUserPermission(initReqUserId, needUpdateUserId);
-    await this.prismaService.$transaction([
-      this.prismaService.user.update({
+    await this.prismaService.$transaction(async () => {
+      await this.prismaService.user.update({
         where: {
           id: needUpdateUserId,
         },
         data: updateUserDto,
-      }),
-      this.prismaService.tour.updateMany({
+      });
+      const tours = await this.prismaService.tour.findMany({
         where: {
           creator: {
             userId: needUpdateUserId,
           },
         },
-        data: {
-          creator: {
-            fullname: updateUserDto.fullname,
+      });
+      tours.forEach(async (tour) => {
+        this.prismaService.tour.update({
+          where: {
+            id: tour.id,
           },
-        },
-      }),
-    ]);
+          data: {
+            creator: {
+              fullname: updateUserDto.fullname,
+            },
+            encodeUrl: this.buildTourEncodeUrl(
+              tour.name,
+              updateUserDto.fullname,
+              tour.id,
+            ),
+          },
+        });
+      });
+    });
   }
 
   async updateOrCreate(user: any) {
@@ -118,5 +130,15 @@ export class UsersService {
     if (initReqUserId !== needUpdateUserId) {
       throw new ForbiddenException('Forbidden');
     }
+  }
+
+  buildTourEncodeUrl(tourName: string, creatorName: string, tourId: string) {
+    const encodeUrl = `p/${encodeURIComponent(
+      creatorName.replace(/ /g, '-'),
+    )}/t/${encodeURIComponent(tourName.replace(/ /g, '-'))}-${tourId.slice(
+      0,
+      12,
+    )}`;
+    return encodeUrl;
   }
 }
