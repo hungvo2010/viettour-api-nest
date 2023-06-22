@@ -79,8 +79,13 @@ export class AuthController {
     const jwtToken = await this.authService.generateToken(newUser);
 
     response
-      .status(HttpStatus.CREATED)
+      .status(HttpStatus.OK)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
+    const { password, ...user } = newUser;
+    response.json({
+      item: user,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   @Post('/change-password')
