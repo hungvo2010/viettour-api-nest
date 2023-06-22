@@ -22,5 +22,7 @@ export class Constant {
   static readonly CACHE_KEY_TOUR: string = 'tour';
   static readonly CACHE_KEY_CREATOR: string = 'creator';
   static readonly CACHE_KEY_ENCODEURL: string = 'encodeUrl';
+  static readonly TOUR_CACHE_INVALIDATION_EVENT: string =
+    'tourCacheInvalidation';
   constructor(private readonly configService: ConfigService) {}
 }

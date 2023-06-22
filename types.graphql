@@ -1,0 +1,20 @@
+type Query {
+  noop: Boolean
+}
+
+type Mutation {
+  ping: Ping
+}
+
+type Subscription {
+  pong: Pong
+  tourCacheInvalidation: Boolean
+}
+
+type Ping {
+  id: ID
+}
+
+type Pong {
+  pingId: ID
+}

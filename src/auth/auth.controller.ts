@@ -20,6 +20,7 @@ import { Response } from 'express';
 import { Constant } from 'src/common/constant';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { IdTokenDto } from './dto/IdToken.dto';
 
 @Controller('/v1.0/auth')
 export class AuthController {
@@ -69,20 +70,17 @@ export class AuthController {
     return {};
   }
 
-  @Get('/google/redirect')
-  @UseGuards(GoogleAuthGuard)
+  @Post('/google/redirect')
   async handleRedirect(
-    @Req() req,
+    @Body() idTokenDto: IdTokenDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const newUser = await this.authService.handleGoogleLogin(req.user._json);
+    const newUser = await this.authService.handleGoogleLogin(idTokenDto);
     const jwtToken = await this.authService.generateToken(newUser);
 
     response
       .status(HttpStatus.CREATED)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-
-    response.redirect(process.env.ALLLOWED_CROSS_ORIGIN);
   }
 
   @Post('/change-password')

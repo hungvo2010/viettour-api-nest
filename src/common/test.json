@@ -1,0 +1,16 @@
+scale: 1,
+opacity: 1,
+x: -1032.465631570221,
+y: -128.3898782503898,
+z: -4886.760969339885,
+title: "",
+description: "",
+link: "",
+imageUrl: "",
+soundUrl: "",
+type: INFO,
+containSceneId: ObjectId
+hotspotStyle: {
+  id: ObjectId,
+  styleUrl: https://res.cloudinary.com/dpn7tctut/image/upload/v1681289135/viettour/ylj3z2oklqitxor9oaen.png
+}

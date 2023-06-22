@@ -13,6 +13,7 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { Constant } from 'src/common/constant';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import * as firebaseAdmin from 'firebase-admin';
 
 @Injectable()
 export class AuthService {
@@ -50,12 +51,9 @@ export class AuthService {
     });
   }
 
-  async handleGoogleLogin(user: any) {
-    return this.usersService.updateOrCreate({
-      email: user.email,
-      fullname: user.name,
-      avatarUrl: user.picture,
-    });
+  async handleGoogleLogin({ idToken }) {
+    const userProfile = await this.getUserProfile(idToken);
+    return await this.usersService.updateOrCreate(userProfile);
   }
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -89,5 +87,19 @@ export class AuthService {
       password: hashedPassword,
     };
     return data;
+  }
+
+  async getUserProfile(idToken: string): Promise<any> {
+    try {
+      const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
+      const userId = decodedToken.uid;
+      const userRecord = await firebaseAdmin.auth().getUser(userId);
+      const { displayName, email, photoURL } = userRecord;
+      this.logger.log('Login with Google: email = ' + email);
+      return { fullname: displayName, email, avatarUrl: photoURL };
+    } catch (error) {
+      console.error('Error retrieving user profile:', error);
+      throw error;
+    }
   }
 }

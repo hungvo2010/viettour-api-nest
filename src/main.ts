@@ -1,3 +1,5 @@
+import { ConfigService } from '@nestjs/config';
+import { RedisService } from 'src/redis/redis.service';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma.service';
@@ -9,6 +11,7 @@ import {
 } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { CommonExceptionFilter } from './filter/common-exception.filter';
+import { configFirebaseAdmin } from './firebase.config';
 
 declare const module: any;
 
@@ -26,6 +29,8 @@ async function bootstrap() {
 
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
+
+  // subscribeCacheInvalidation(app);
 }
 
 function configureApp(app: INestApplication) {
@@ -52,6 +57,12 @@ function configureApp(app: INestApplication) {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
   app.use(cookieParser());
+  configFirebaseAdmin(app.get(ConfigService));
 }
+
+// function subscribeCacheInvalidation(app: INestApplication) {
+//   const redisService = app.get(RedisService);
+//   redisService.subscribeInvalidateCacheEvent();
+// }
 
 bootstrap();

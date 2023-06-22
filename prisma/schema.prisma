@@ -20,7 +20,7 @@ model User {
   userCategory UserCategory @default(VIRTUAL_TOUR_ENTHUSIAST)
   company      String?
   phoneNumber  String?
-  avatarUrl    String       @default("https://media.istockphoto.com/id/1296158947/photo/portrait-of-creative-trendy-black-african-male-designer-laughing.jpg?s=612x612&w=0&k=20&c=1Ws_LSzWjYvegGxHYQkkgVytdpDcnmK0upJyGOzEPcg=")
+  avatarUrl    String       @default("https://res.cloudinary.com/dpn7tctut/image/upload/v1687445957/aoa4jflsuikz3wviwete.png")
   coverUrl     String       @default("https://www.klapty.com/public/assets/img/default-cover.png")
 
   tours EmbeddedTour[]
