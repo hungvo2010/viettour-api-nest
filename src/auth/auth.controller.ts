@@ -11,7 +11,6 @@ import {
   Logger,
   HttpCode,
   Get,
-  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
@@ -71,11 +70,29 @@ export class AuthController {
   }
 
   @Post('/google/redirect')
-  async handleRedirect(
+  async handleGoogleRedirect(
     @Body() idTokenDto: IdTokenDto,
     @Res({ passthrough: true }) response: Response,
   ) {
     const newUser = await this.authService.handleGoogleLogin(idTokenDto);
+    const jwtToken = await this.authService.generateToken(newUser);
+
+    response
+      .status(HttpStatus.OK)
+      .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
+    const { password, ...user } = newUser;
+    response.json({
+      item: user,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  @Post('/facebook/redirect')
+  async handleFacebookRedirect(
+    @Body() idTokenDto: IdTokenDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const newUser = await this.authService.handleFacebookLogin(idTokenDto);
     const jwtToken = await this.authService.generateToken(newUser);
 
     response

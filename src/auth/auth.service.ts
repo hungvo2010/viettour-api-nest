@@ -52,7 +52,12 @@ export class AuthService {
   }
 
   async handleGoogleLogin({ idToken }) {
-    const userProfile = await this.getUserProfile(idToken);
+    const userProfile = await this.getGoogleUserProfile(idToken);
+    return await this.usersService.updateOrCreate(userProfile);
+  }
+
+  async handleFacebookLogin({ idToken }) {
+    const userProfile = await this.getFacebookUserProfile(idToken);
     return await this.usersService.updateOrCreate(userProfile);
   }
 
@@ -89,7 +94,21 @@ export class AuthService {
     return data;
   }
 
-  async getUserProfile(idToken: string): Promise<any> {
+  async getGoogleUserProfile(idToken: string): Promise<any> {
+    try {
+      const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
+      const userId = decodedToken.uid;
+      const userRecord = await firebaseAdmin.auth().getUser(userId);
+      const { displayName, email, photoURL } = userRecord;
+      this.logger.log('Login with Google: email = ' + email);
+      return { fullname: displayName, email, avatarUrl: photoURL };
+    } catch (error) {
+      console.error('Error retrieving user profile:', error);
+      throw error;
+    }
+  }
+
+  async getFacebookUserProfile(idToken: string): Promise<any> {
     try {
       const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
       const userId = decodedToken.uid;
