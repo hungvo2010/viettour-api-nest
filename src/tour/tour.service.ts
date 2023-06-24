@@ -142,6 +142,9 @@ export class TourService {
           encodeUrl: true,
           likeCount: true,
           viewCount: true,
+          creator: true,
+          privacyStatus: true,
+          editStatus: true,
         },
       });
       await this.cacheManager.set(Constant.CACHE_KEY_CREATOR + userId, tours);
