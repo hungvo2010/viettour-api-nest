@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client/core';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CookieOptions } from 'express';
@@ -24,5 +25,11 @@ export class Constant {
   static readonly CACHE_KEY_ENCODEURL: string = 'encodeUrl';
   static readonly TOUR_CACHE_INVALIDATION_EVENT: string =
     'tourCacheInvalidation';
+  static readonly INVALIDATION_CACHE_SUBSCRIPTION = gql`
+    subscription {
+      ${Constant.TOUR_CACHE_INVALIDATION_EVENT} {
+        cacheKey
+      }
+    }`;
   constructor(private readonly configService: ConfigService) {}
 }
