@@ -31,5 +31,12 @@ export class Constant {
         cacheKey
       }
     }`;
+  static readonly PING_MUTATION = gql`
+    mutation {
+      ping {
+        id
+      }
+    }
+  `;
   constructor(private readonly configService: ConfigService) {}
 }

@@ -12,6 +12,7 @@ import { Constant } from 'src/common/constant';
 import { createClient } from 'graphql-ws';
 import { getMainDefinition } from '@apollo/client/utilities';
 import WebSocket from 'ws';
+import fetch from 'cross-fetch';
 
 @Injectable()
 export class SubscribeService {
@@ -19,33 +20,36 @@ export class SubscribeService {
   private readonly wsLink: GraphQLWsLink;
   private readonly httpLink: HttpLink;
   private readonly splitLink: ApolloLink;
-  private readonly client: ApolloClient<any>;
+  private client: ApolloClient<any>;
   constructor() {
-    this.wsLink = new GraphQLWsLink(
-      createClient({
-        webSocketImpl: WebSocket,
-        url: process.env.WS_MAIN_WRITE_API,
-      }),
-    );
+    this.wsLink =
+      typeof window !== 'undefined'
+        ? new GraphQLWsLink(
+            createClient({
+              webSocketImpl: WebSocket,
+              url: process.env.WS_MAIN_WRITE_API,
+            }),
+          )
+        : null;
     this.httpLink = new HttpLink({
       uri: process.env.MAIN_WRITE_API,
+      fetch,
+      credentials: 'include',
     });
-    this.splitLink = split(
-      ({ query }) => {
-        const definition = getMainDefinition(query);
-        return (
-          definition.kind === 'OperationDefinition' &&
-          definition.operation === 'subscription'
-        );
-      },
-      this.wsLink,
-      this.httpLink,
-    );
-    this.client = new ApolloClient({
-      ssrMode: true,
-      link: this.wsLink, // Replace with the GraphQL endpoint URL of Server B
-      cache: new InMemoryCache(),
-    });
+    this.splitLink =
+      typeof window !== 'undefined' && this.wsLink
+        ? split(
+            ({ query }) => {
+              const definition = getMainDefinition(query);
+              return (
+                definition.kind === 'OperationDefinition' &&
+                definition.operation === 'subscription'
+              );
+            },
+            this.wsLink,
+            this.httpLink,
+          )
+        : this.httpLink;
   }
   @Cron(CronExpression.EVERY_5_SECONDS)
   handleCron() {
@@ -54,8 +58,29 @@ export class SubscribeService {
 
   @Cron(CronExpression.EVERY_5_SECONDS)
   subscribeCacheInvalidationEvent() {
-    this.client.subscribe({
-      query: Constant.INVALIDATION_CACHE_SUBSCRIPTION,
-    });
+    if (!this.client) {
+      this.client = new ApolloClient({
+        // ssrMode: true,
+        link: this.splitLink,
+        cache: new InMemoryCache(),
+      });
+    }
+    this.client
+      .subscribe({
+        query: Constant.INVALIDATION_CACHE_SUBSCRIPTION,
+      })
+      .subscribe({
+        next: (data) => {
+          this.logger.log(data);
+        },
+      });
+
+    // this.client
+    //   .mutate({
+    //     mutation: Constant.PING_MUTATION,
+    //   })
+    //   .then((res) => {
+    //     this.logger.log(res);
+    //   });
   }
 }
