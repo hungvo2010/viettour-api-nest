@@ -63,7 +63,7 @@ export class TourService {
   }
 
   async findOne(tourId: string): Promise<Tour | undefined> {
-    let tour: Tour;
+    let tour: Tour = null;
     tour = await this.cacheManager.get(Constant.CACHE_KEY_TOUR + tourId);
     if (!tour) {
       tour = await this.prismaService.tour.findFirst({
@@ -171,5 +171,12 @@ export class TourService {
     if (!tour) throw new NotFoundException('Tour not found');
     if (tour?.creator?.userId !== userId)
       throw new ForbiddenException('Wrong permission');
+  }
+
+  isCachedInvalid(cacheKey) {
+    // const tour = await this.cacheManager.get(cacheKey);
+    // this.logger.log(`isCachedInvalid: ${cacheKey}, ${JSON.stringify(tour)}`);
+    this.logger.log(this.cacheManager.store.getTtl);
+    return false;
   }
 }
