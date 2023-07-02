@@ -10,14 +10,14 @@ import {
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { EmbeddedTour, Tour, PrivacyStatus } from '@prisma/client';
-import { RedisService } from 'src/redis/redis.service';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class TourService {
   constructor(
     private readonly prismaService: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private redisService: RedisService,
+    private cacheService: CacheService,
   ) {}
   private readonly logger = new Logger(TourService.name);
 
@@ -66,6 +66,7 @@ export class TourService {
     let tour: Tour = null;
     tour = await this.cacheManager.get(Constant.CACHE_KEY_TOUR + tourId);
     if (!tour) {
+      this.logger.log('tour not cached: ', tourId);
       tour = await this.prismaService.tour.findFirst({
         where: {
           id: tourId,
@@ -119,7 +120,7 @@ export class TourService {
   async findByCreator(userId: string): Promise<EmbeddedTour[]> {
     let tours: EmbeddedTour[];
     tours = await this.cacheManager.get(Constant.CACHE_KEY_CREATOR + userId);
-    this.logger.log('toursByCreator: ', tours?.length);
+    this.logger.log('toursByCreator: ', userId);
     if (!tours) {
       tours = await this.prismaService.tour.findMany({
         where: {
@@ -153,13 +154,14 @@ export class TourService {
   }
 
   async deleteTour(tourId: string, { userId }) {
+    this.logger.log(`deleteTour: ${tourId} of user ${userId}`);
     await this.checkUserPermission(userId, tourId);
     await this.prismaService.tour.delete({
       where: {
         id: tourId,
       },
     });
-    await this.redisService.deleteCreatorToursCache(userId);
+    await this.cacheService.deleteCreatorToursCache(userId);
   }
 
   async checkUserPermission(userId: string, tourId: string) {
@@ -171,12 +173,5 @@ export class TourService {
     if (!tour) throw new NotFoundException('Tour not found');
     if (tour?.creator?.userId !== userId)
       throw new ForbiddenException('Wrong permission');
-  }
-
-  isCachedInvalid(cacheKey) {
-    // const tour = await this.cacheManager.get(cacheKey);
-    // this.logger.log(`isCachedInvalid: ${cacheKey}, ${JSON.stringify(tour)}`);
-    this.logger.log(this.cacheManager.store.getTtl);
-    return false;
   }
 }

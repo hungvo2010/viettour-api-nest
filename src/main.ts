@@ -1,5 +1,4 @@
 import { ConfigService } from '@nestjs/config';
-import { RedisService } from 'src/redis/redis.service';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma.service';

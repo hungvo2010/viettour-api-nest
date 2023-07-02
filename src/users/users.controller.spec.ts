@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { PrismaService } from 'src/prisma.service';
-import { RedisService } from 'src/redis/redis.service';
+import { CacheService } from 'src/cache/cache.service';
 import { TourService } from 'src/tour/tour.service';
 import { CACHE_MANAGER } from '@nestjs/common';
 
@@ -16,7 +16,7 @@ describe('UsersController', () => {
         UsersService,
         PrismaService,
         TourService,
-        RedisService,
+        CacheService,
         { provide: CACHE_MANAGER, useValue: {} },
       ],
     }).compile();

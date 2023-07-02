@@ -3,11 +3,11 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { PrismaService } from 'src/prisma.service';
 import { TourService } from 'src/tour/tour.service';
-import { RedisService } from 'src/redis/redis.service';
+import { CacheService } from 'src/cache/cache.service';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, PrismaService, TourService, RedisService],
+  providers: [UsersService, PrismaService, TourService, CacheService],
   exports: [UsersService],
 })
 export class UsersModule {}

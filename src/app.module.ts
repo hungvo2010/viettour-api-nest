@@ -1,7 +1,7 @@
 import { Constant } from 'src/common/constant';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { SubscribeService } from './redis/subscribe.service';
+import { SubscribeService } from './cache/subscribe.service';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
@@ -11,11 +11,13 @@ import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
 // import { GraphQLModule } from '@nestjs/graphql';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CacheInvalidateModule } from './cache/cache.invalidate.module';
 
 @Module({
   imports: [
     UsersModule,
     TourModule,
+    CacheInvalidateModule,
     ConfigModule.forRoot({
       envFilePath: '.env.development',
       isGlobal: true,
