@@ -187,6 +187,7 @@ enum TourCategory {
   SCHOOL_COLLEGES_EDUCATION
   OTHER
   NOT_SET
+  ALL
 }
 
 enum HotspotType {
