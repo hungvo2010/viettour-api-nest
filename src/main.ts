@@ -9,6 +9,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import * as compression from 'compression';
 import { CommonExceptionFilter } from './filter/common-exception.filter';
 import { configFirebaseAdmin } from './firebase.config';
 
@@ -56,6 +57,7 @@ function configureApp(app: INestApplication) {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
   app.use(cookieParser());
+  app.use(compression());
   configFirebaseAdmin(app.get(ConfigService));
 }
 
