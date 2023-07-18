@@ -103,18 +103,31 @@ export class TourService {
     const url = encodeURI(encodeUrl);
     this.logger.log(`findByEncodeUrl: ${url}`);
     let tour: Tour;
-    tour = await this.cacheManager.get(Constant.CACHE_KEY_ENCODEURL + url);
-    if (!tour) {
+    const tourId = await this.getTourIdByEncodeUrl(url);
+    if (tourId) {
+      tour = await this.findOne(tourId);
+    } else {
       tour = await this.prismaService.tour.findUnique({
         where: {
           encodeUrl: url,
         },
       });
       tour = tour.privacyStatus === PrivacyStatus.PUBLIC ? tour : null;
-      if (tour)
-        await this.cacheManager.set(Constant.CACHE_KEY_ENCODEURL + url, tour);
+      if (tour) {
+        await this.cacheManager.set(
+          Constant.CACHE_KEY_ENCODEURL + url,
+          tour.id,
+        );
+      }
     }
     return tour;
+  }
+
+  async getTourIdByEncodeUrl(url: string) {
+    const tourId = await this.cacheManager.get(
+      Constant.CACHE_KEY_ENCODEURL + url,
+    );
+    return tourId;
   }
 
   async findByCreator(userId: string): Promise<EmbeddedTour[]> {
