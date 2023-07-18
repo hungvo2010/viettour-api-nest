@@ -96,17 +96,17 @@ export class TourService {
       });
       await this.cacheManager.set(Constant.CACHE_KEY_TOUR + tourId, tour);
     }
-    tour.likeCount = await this.handleIncreaseLikeCount(tour);
+    tour.viewCount = await this.handleIncreaseViewCount(tour);
     return tour;
   }
 
-  async handleIncreaseLikeCount(tour: Tour): Promise<number> {
-    let likeCount = this.cacheManager.get(
-      Constant.CACHE_KEY_TOURLIKE + tour.id,
+  async handleIncreaseViewCount(tour: Tour): Promise<number> {
+    let viewCount = this.cacheManager.get(
+      Constant.CACHE_KEY_TOURVIEW + tour.id,
     );
-    likeCount = likeCount ? likeCount + 1 : 1;
-    this.cacheManager.set(Constant.CACHE_KEY_TOURLIKE + tour.id, likeCount);
-    return likeCount;
+    viewCount = viewCount ? viewCount + 1 : 1;
+    this.cacheManager.set(Constant.CACHE_KEY_TOURVIEW + tour.id, viewCount);
+    return viewCount;
   }
 
   async findByEncodeUrl(encodeUrl: string): Promise<Tour | undefined> {
