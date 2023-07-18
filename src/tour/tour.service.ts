@@ -131,38 +131,38 @@ export class TourService {
   }
 
   async findByCreator(userId: string): Promise<EmbeddedTour[]> {
-    let tours: EmbeddedTour[];
-    tours = await this.cacheManager.get(Constant.CACHE_KEY_CREATOR + userId);
-    this.logger.log('toursByCreator: ', userId);
-    if (!tours) {
-      tours = await this.prismaService.tour.findMany({
-        where: {
-          creator: {
-            is: {
-              userId,
-            },
+    // let tours: EmbeddedTour[];
+    // tours = await this.cacheManager.get(Constant.CACHE_KEY_CREATOR + userId);
+    // this.logger.log('toursByCreator: ', userId);
+    // if (!tours) {
+    const tours = await this.prismaService.tour.findMany({
+      where: {
+        creator: {
+          is: {
+            userId,
           },
-          privacyStatus: PrivacyStatus.PUBLIC,
         },
-        select: {
-          id: true,
-          name: true,
-          address: true,
-          description: true,
-          socialImage: true,
-          category: true,
-          createdAt: true,
-          modifiedAt: true,
-          encodeUrl: true,
-          likeCount: true,
-          viewCount: true,
-          creator: true,
-          privacyStatus: true,
-          editStatus: true,
-        },
-      });
-      await this.cacheManager.set(Constant.CACHE_KEY_CREATOR + userId, tours);
-    }
+        privacyStatus: PrivacyStatus.PUBLIC,
+      },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        description: true,
+        socialImage: true,
+        category: true,
+        createdAt: true,
+        modifiedAt: true,
+        encodeUrl: true,
+        likeCount: true,
+        viewCount: true,
+        creator: true,
+        privacyStatus: true,
+        editStatus: true,
+      },
+    });
+    // await this.cacheManager.set(Constant.CACHE_KEY_CREATOR + userId, tours);
+    // }
     return tours;
   }
 
