@@ -100,12 +100,15 @@ export class TourService {
     return tour;
   }
 
-  async handleIncreaseViewCount(tour: Tour): Promise<number> {
-    let viewCount = this.cacheManager.get(
+  async handleIncreaseViewCount(tour: Tour): Promise<number | undefined> {
+    let viewCount = await this.cacheManager.get(
       Constant.CACHE_KEY_TOURVIEW + tour.id,
     );
     viewCount = viewCount ? viewCount + 1 : 1;
-    this.cacheManager.set(Constant.CACHE_KEY_TOURVIEW + tour.id, viewCount);
+    await this.cacheManager.set(
+      Constant.CACHE_KEY_TOURVIEW + tour.id,
+      viewCount,
+    );
     return viewCount;
   }
 
