@@ -96,7 +96,17 @@ export class TourService {
       });
       await this.cacheManager.set(Constant.CACHE_KEY_TOUR + tourId, tour);
     }
+    tour.likeCount = await this.handleIncreaseLikeCount(tour);
     return tour;
+  }
+
+  async handleIncreaseLikeCount(tour: Tour): Promise<number> {
+    let likeCount = this.cacheManager.get(
+      Constant.CACHE_KEY_TOURLIKE + tour.id,
+    );
+    likeCount = likeCount ? likeCount + 1 : 1;
+    this.cacheManager.set(Constant.CACHE_KEY_TOURLIKE + tour.id, likeCount);
+    return likeCount;
   }
 
   async findByEncodeUrl(encodeUrl: string): Promise<Tour | undefined> {
