@@ -14,6 +14,7 @@ export class CacheService {
   async deleteCache(key: string) {
     this.logger.log(`deleteCache: ${key}`);
     await this.cacheManager.del(key);
+    this.logger.log(await this.cacheManager.get(key));
   }
 
   // async subscribeInvalidateCacheEvent() {
