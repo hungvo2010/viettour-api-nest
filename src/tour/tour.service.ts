@@ -225,7 +225,7 @@ export class TourService {
         id: tourId,
       },
     });
-    await this.cacheService.deleteCreatorToursCache(userId);
+    // await this.cacheService.deleteCreatorToursCache(userId);
   }
 
   async checkUserPermission(userId: string, tourId: string) {
