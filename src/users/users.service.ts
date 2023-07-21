@@ -1,15 +1,24 @@
 import { TourService } from './../tour/tour.service';
-import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ForbiddenException,
+  CACHE_MANAGER,
+  Inject,
+} from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User, EmbeddedTour } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { Constant } from 'src/common/constant';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
   constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private prismaService: PrismaService,
     private tourService: TourService,
   ) {}
@@ -39,38 +48,47 @@ export class UsersService {
       'initReqUserId: ' + initReqUserId,
     );
     await this.checkUserPermission(initReqUserId, needUpdateUserId);
-    await this.prismaService.$transaction(async () => {
-      await this.prismaService.user.update({
-        where: {
-          id: needUpdateUserId,
-        },
-        data: updateUserDto,
-      });
-      const tours = await this.prismaService.tour.findMany({
-        where: {
-          creator: {
+    // return await this.prismaService.$transaction(async () => {
+    await this.prismaService.user.update({
+      where: {
+        id: needUpdateUserId,
+      },
+      data: updateUserDto,
+    });
+    const tours = await this.prismaService.tour.findMany({
+      where: {
+        creator: {
+          is: {
             userId: needUpdateUserId,
           },
         },
-      });
-      tours.forEach(async (tour) => {
-        this.prismaService.tour.update({
-          where: {
-            id: tour.id,
+      },
+    });
+    this.logger.log(tours);
+    tours.forEach(async (tour) => {
+      this.logger.log('tour: ' + tour.id);
+      await this.cacheManager.del(Constant.CACHE_KEY_TOUR + tour.id);
+      await this.cacheManager.del(
+        Constant.CACHE_KEY_ENCODEURL + tour.encodeUrl,
+      );
+      await this.prismaService.tour.update({
+        where: {
+          id: tour.id,
+        },
+        data: {
+          creator: {
+            ...tour.creator,
+            fullname: updateUserDto.fullname,
           },
-          data: {
-            creator: {
-              fullname: updateUserDto.fullname,
-            },
-            encodeUrl: this.buildTourEncodeUrl(
-              tour.name,
-              updateUserDto.fullname,
-              tour.id,
-            ),
-          },
-        });
+          encodeUrl: this.buildTourEncodeUrl(
+            tour.name,
+            updateUserDto.fullname,
+            tour.id,
+          ),
+        },
       });
     });
+    // });
   }
 
   async updateOrCreate(user: any) {
@@ -128,6 +146,7 @@ export class UsersService {
 
   async checkUserPermission(initReqUserId: string, needUpdateUserId: string) {
     if (initReqUserId !== needUpdateUserId) {
+      this.logger.log('checkUserPermission: ' + initReqUserId);
       throw new ForbiddenException('Forbidden');
     }
   }

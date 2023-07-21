@@ -14,6 +14,42 @@ import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class TourService {
+  async updateUserFailed() {
+    const creator = await this.prismaService.user.findUnique({
+      where: {
+        id: '643eb17f10cf8fc98ca2db2b',
+      },
+    });
+    this.logger.log('creator: ' + JSON.stringify(creator));
+    const tours = await this.prismaService.tour.findMany({
+      where: {
+        creator: {
+          is: {
+            userId: undefined,
+          },
+        },
+      },
+    });
+    this.logger.log('tours: ' + JSON.stringify(tours));
+    tours.forEach(async (tour) => {
+      await this.prismaService.tour.update({
+        where: {
+          id: tour.id,
+        },
+        data: {
+          creator: {
+            userId: creator.id,
+            fullname: creator.fullname,
+            avatarUrl: creator.avatarUrl,
+            address: creator.address,
+            description: creator.description,
+            userCategory: creator.userCategory,
+            phoneNumber: creator.phoneNumber,
+          },
+        },
+      });
+    });
+  }
   constructor(
     private readonly prismaService: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -96,7 +132,9 @@ export class TourService {
       });
       await this.cacheManager.set(Constant.CACHE_KEY_TOUR + tourId, tour);
     }
-    tour.viewCount = await this.handleIncreaseViewCount(tour);
+    if (tour) {
+      tour.viewCount = await this.handleIncreaseViewCount(tour);
+    }
     return tour;
   }
 

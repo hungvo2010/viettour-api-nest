@@ -23,20 +23,5 @@ export class Constant {
   static readonly CACHE_KEY_TOUR: string = 'tour';
   static readonly CACHE_KEY_CREATOR: string = 'creator';
   static readonly CACHE_KEY_ENCODEURL: string = 'encodeUrl';
-  static readonly TOUR_CACHE_INVALIDATION_EVENT: string =
-    'tourCacheInvalidation';
-  // static readonly INVALIDATION_CACHE_SUBSCRIPTION = gql`
-  //   subscription {
-  //     ${Constant.TOUR_CACHE_INVALIDATION_EVENT} {
-  //       cacheKey
-  //     }
-  //   }`;
-  // static readonly PING_MUTATION = gql`
-  //   mutation {
-  //     ping {
-  //       id
-  //     }
-  //   }
-  // `;
   constructor(private readonly configService: ConfigService) {}
 }
