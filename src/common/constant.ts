@@ -7,6 +7,7 @@ export class Constant {
   static readonly JWT_EXPIRES_IN = 18000; // in seconds
   static readonly SALT_ROUNDS: number = 10;
   static COOKIE_EXPIRES_IN = 18000000; // in milliseconds
+  static readonly EVERY_2_MINUTES = '*/2 * * * *';
   static readonly COOKIE_OPTIONS: CookieOptions = {
     httpOnly: true,
     secure: true,

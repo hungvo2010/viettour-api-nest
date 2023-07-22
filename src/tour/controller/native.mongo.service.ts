@@ -9,9 +9,14 @@ export class NativeMongoService {
 
   private async initTourCollection() {
     const client = new MongoClient(process.env.DATABASE_URL);
-    await client.connect();
-    const db = client.db('viettour');
-    this.tourCollection = db.collection('Tour');
+    try {
+      await client.connect();
+      const db = client.db('viettour');
+      this.tourCollection = db.collection('Tour');
+    } catch (e) {
+      this.logger.error(e);
+      this.tourCollection = null;
+    }
   }
 
   public async performFullTextSearch(query: string) {

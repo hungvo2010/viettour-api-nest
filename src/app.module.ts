@@ -1,3 +1,4 @@
+import { PrismaService } from './prisma.service';
 import { Constant } from 'src/common/constant';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
