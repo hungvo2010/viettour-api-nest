@@ -28,6 +28,16 @@ export class TourViewerController {
     };
   }
 
+  @Get('search')
+  async getTourByFilter(@Query('query') query: string) {
+    this.logger.log(`getTourByFilter: ${query}`);
+    const tours = await this.tourService.getToursWithFilter(query);
+    return {
+      values: tours,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   @Get(':id')
   async getTour(@Param('id') tourId: string) {
     this.logger.log(`getTour: ${tourId}`);

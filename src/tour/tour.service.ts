@@ -11,6 +11,7 @@ import {
 import { Cache } from 'cache-manager';
 import { EmbeddedTour, Tour, PrivacyStatus } from '@prisma/client';
 import { CacheService } from 'src/cache/cache.service';
+import { NativeMongoService } from './controller/native.mongo.service';
 
 @Injectable()
 export class TourService {
@@ -51,8 +52,9 @@ export class TourService {
     });
   }
   constructor(
-    private readonly prismaService: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly prismaService: PrismaService,
+    private nativeMongoService: NativeMongoService,
     private cacheService: CacheService,
   ) {}
   private readonly logger = new Logger(TourService.name);
@@ -96,6 +98,10 @@ export class TourService {
         },
       }),
     ]);
+  }
+
+  async getToursWithFilter(query: string) {
+    return await this.nativeMongoService.performFullTextSearch(query);
   }
 
   async findOne(tourId: string): Promise<Tour | undefined> {

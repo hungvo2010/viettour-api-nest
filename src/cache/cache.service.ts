@@ -16,20 +16,4 @@ export class CacheService {
     await this.cacheManager.del(key);
     this.logger.log(await this.cacheManager.get(key));
   }
-
-  // async subscribeInvalidateCacheEvent() {
-  //   const mainWriteEndPoint = this.configService.get('MAIN_WRITE_ENDPOINT');
-  //   const subscriptionReq = gql`
-  //     subscription {
-  //       cacheInvalidation {
-  //         true
-  //       }
-  //     }
-  //   `;
-  //   const client = new ApolloClient({
-  //     uri: mainWriteEndPoint,
-  //     cache: Cache,
-  //   });
-  //   client.subscribe().subscribe({});
-  // }
 }
