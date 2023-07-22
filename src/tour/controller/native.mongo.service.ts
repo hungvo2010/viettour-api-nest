@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { PrivacyStatus } from '@prisma/client';
 import { MongoClient } from 'mongodb';
 
 @Injectable()
@@ -21,7 +22,7 @@ export class NativeMongoService {
     }
     if (this.tourCollection) {
       this.logger.log('here');
-      return await this.tourCollection
+      const tours = await this.tourCollection
         .aggregate([
           {
             $search: {
@@ -36,7 +37,12 @@ export class NativeMongoService {
           },
         ])
         .toArray();
+      return this.filterPublicTours(tours);
     }
     return [];
+  }
+
+  private filterPublicTours(tours: any[]) {
+    return tours.filter((tour) => tour.privacyStatus === PrivacyStatus.PUBLIC);
   }
 }
