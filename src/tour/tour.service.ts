@@ -138,7 +138,7 @@ export class TourService {
           Constant.CACHE_KEY_ENCODEURL + url,
           tour.id,
         );
-        await this.cacheManager.set(Constant.CACHE_KEY_TOUR + tour.id, tour);
+        // await this.cacheManager.set(Constant.CACHE_KEY_TOUR + tour.id, tour);
       }
     }
     if (tour) {
