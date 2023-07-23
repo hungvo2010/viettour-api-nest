@@ -154,7 +154,7 @@ export class TourService {
     return tourId;
   }
 
-  async findByCreator(userId: string): Promise<EmbeddedTour[]> {
+  async findByCreator(userId: string): Promise<any[]> {
     // let tours: EmbeddedTour[];
     // tours = await this.cacheManager.get(Constant.CACHE_KEY_CREATOR + userId);
     // this.logger.log('toursByCreator: ', userId);
@@ -166,7 +166,6 @@ export class TourService {
             userId,
           },
         },
-        privacyStatus: PrivacyStatus.PUBLIC,
       },
       select: {
         id: true,
@@ -185,6 +184,7 @@ export class TourService {
         editStatus: true,
       },
     });
+
     // await this.cacheManager.set(Constant.CACHE_KEY_CREATOR + userId, tours);
     // }
     return tours;

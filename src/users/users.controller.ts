@@ -40,8 +40,11 @@ export class UsersController {
   }
 
   @Get(':userId/tours')
-  async getUserTours(@Param('userId') userId: string) {
-    const tours = await this.usersService.getUserTours(userId);
+  async getUserTours(@Param('userId') userId: string, @Request() req) {
+    const tours = await this.usersService.getUserTours(
+      userId,
+      req.user?.userId,
+    );
     return {
       values: tours,
       timestamp: new Date().toISOString(),

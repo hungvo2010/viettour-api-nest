@@ -9,9 +9,10 @@ import {
 import { Cache } from 'cache-manager';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma, User, EmbeddedTour } from '@prisma/client';
+import { Prisma, User, EmbeddedTour, PrivacyStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Constant } from 'src/common/constant';
+import { length } from 'class-validator';
 
 @Injectable()
 export class UsersService {
@@ -133,14 +134,33 @@ export class UsersService {
     return user;
   }
 
-  async findByUserIdIncludeTours(userId: string): Promise<User | undefined> {
-    const user = await this.findByUserId(userId);
-    user.tours = await this.getUserTours(userId);
-    return user;
-  }
+  // async findByUserIdIncludeTours(userId: string): Promise<User | undefined> {
+  //   const user = await this.findByUserId(userId);
+  //   let allUserTours = await this.getUserTours(userId);
+  //   allUserTours = allUserTours.filter((tour) => {
+  //     if (
+  //       tour.privacyStatus === PrivacyStatus.PUBLIC ||
+  //       tour.creator.id === userId
+  //     ) {
+  //       return true;
+  //     }
+  //   });
+  //   user.tours = allUserTours;
+  //   return user;
+  // }
 
-  async getUserTours(userId: string): Promise<EmbeddedTour[]> {
-    const tours = await this.tourService.findByCreator(userId);
+  async getUserTours(userId: string, initReqUserId: string): Promise<any[]> {
+    this.logger.log('initGetUserTours: ' + initReqUserId);
+    let tours = await this.tourService.findByCreator(userId);
+    tours = tours.filter((tour) => {
+      if (
+        tour.privacyStatus === PrivacyStatus.PUBLIC ||
+        tour.creator.userId === initReqUserId
+      ) {
+        return true;
+      }
+      return false;
+    });
     return tours;
   }
 
