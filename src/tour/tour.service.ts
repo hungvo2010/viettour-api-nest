@@ -109,7 +109,8 @@ export class TourService {
     let viewCount = await this.cacheManager.get(
       Constant.CACHE_KEY_TOURVIEW + tour.id,
     );
-    viewCount = viewCount ? viewCount + 1 : tour.viewCount + 1;
+    this.logger.log('viewCount: ', viewCount);
+    viewCount = viewCount ? +viewCount + 1 : +tour.viewCount + 1;
     await this.cacheManager.set(
       Constant.CACHE_KEY_TOURVIEW + tour.id,
       viewCount,
@@ -122,6 +123,7 @@ export class TourService {
     this.logger.log(`findByEncodeUrl: ${url}`);
     let tour: Tour;
     const tourId = await this.getTourIdByEncodeUrl(url);
+    this.logger.log('tourId: ', tourId);
     if (tourId) {
       tour = await this.findOne(tourId);
     } else {
@@ -136,6 +138,7 @@ export class TourService {
           Constant.CACHE_KEY_ENCODEURL + url,
           tour.id,
         );
+        await this.cacheManager.set(Constant.CACHE_KEY_TOUR + tour.id, tour);
       }
     }
     if (tour) {
