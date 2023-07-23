@@ -109,7 +109,7 @@ export class TourService {
     let viewCount = await this.cacheManager.get(
       Constant.CACHE_KEY_TOURVIEW + tour.id,
     );
-    viewCount = viewCount ? viewCount + 1 : 1;
+    viewCount = viewCount ? viewCount + 1 : tour.viewCount + 1;
     await this.cacheManager.set(
       Constant.CACHE_KEY_TOURVIEW + tour.id,
       viewCount,
