@@ -22,7 +22,7 @@ export class UsersService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private prismaService: PrismaService,
     private tourService: TourService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto) {
     const data: Prisma.UserCreateInput = {
@@ -154,7 +154,7 @@ export class UsersService {
     let tours = await this.tourService.findByCreator(userId);
     tours = tours.filter((tour) => {
       if (
-        tour.privacyStatus === PrivacyStatus.PUBLIC ||
+        (tour.privacyStatus === PrivacyStatus.PUBLIC && tour.privacyStatus === PrivacyStatus.PUBLISHED) ||
         tour.creator.userId === initReqUserId
       ) {
         return true;
