@@ -9,7 +9,7 @@ import {
 import { Cache } from 'cache-manager';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma, User, EmbeddedTour, PrivacyStatus } from '@prisma/client';
+import { Prisma, User, EmbeddedTour, PrivacyStatus, EditStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Constant } from 'src/common/constant';
 import { length } from 'class-validator';
@@ -154,7 +154,7 @@ export class UsersService {
     let tours = await this.tourService.findByCreator(userId);
     tours = tours.filter((tour) => {
       if (
-        (tour.privacyStatus === PrivacyStatus.PUBLIC && tour.privacyStatus === PrivacyStatus.PUBLISHED) ||
+        (tour.privacyStatus === PrivacyStatus.PUBLIC && tour.editStatus === EditStatus.PUBLISHED) ||
         tour.creator.userId === initReqUserId
       ) {
         return true;
