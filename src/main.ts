@@ -54,7 +54,7 @@ function configureApp(app: INestApplication) {
     }),
   );
   app.enableCors({
-    origin: process.env.ALLLOWED_CROSS_ORIGIN.split(', '),
+    origin: process.env.ALLOWED_CROSS_ORIGIN.split(', '),
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });

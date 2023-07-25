@@ -9,10 +9,9 @@ import {
 import { Cache } from 'cache-manager';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma, User, EmbeddedTour, PrivacyStatus, EditStatus } from '@prisma/client';
+import { Prisma, User, PrivacyStatus, EditStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { Constant } from 'src/common/constant';
-import { length } from 'class-validator';
 
 @Injectable()
 export class UsersService {
@@ -22,7 +21,7 @@ export class UsersService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private prismaService: PrismaService,
     private tourService: TourService,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     const data: Prisma.UserCreateInput = {
@@ -154,7 +153,8 @@ export class UsersService {
     let tours = await this.tourService.findByCreator(userId);
     tours = tours.filter((tour) => {
       if (
-        (tour.privacyStatus === PrivacyStatus.PUBLIC && tour.editStatus === EditStatus.PUBLISHED) ||
+        (tour.privacyStatus === PrivacyStatus.PUBLIC &&
+          tour.editStatus === EditStatus.PUBLISHED) ||
         tour.creator.userId === initReqUserId
       ) {
         return true;
