@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  Body,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -15,7 +16,7 @@ import { LikeTourDto } from '../dto/like-tour.dto';
 
 @Controller('/v1.0/tours/')
 export class TourViewerController {
-  constructor(private readonly tourService: TourService) { }
+  constructor(private readonly tourService: TourService) {}
   private readonly logger = new Logger(TourViewerController.name);
 
   @Get('all')
@@ -60,9 +61,12 @@ export class TourViewerController {
   }
 
   @Post(':id/like')
-  async likeTour(@Body() likeTourDto: LikeTourDto, @Param('id') tourId: string) {
+  async likeTour(
+    @Body() likeTourDto: LikeTourDto,
+    @Param('id') tourId: string,
+  ) {
     this.logger.log('Like tour: ' + tourId);
-    await this.tourService.likeTour(tourId, likeTourDto)
+    await this.tourService.likeTour(tourId, likeTourDto);
   }
 
   @UseGuards(JwtAuthGuard)
