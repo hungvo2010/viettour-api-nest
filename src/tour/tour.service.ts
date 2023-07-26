@@ -110,7 +110,7 @@ export class TourService {
       Constant.CACHE_KEY_TOURVIEW + tour.id,
     );
     this.logger.log('viewCount: ', viewCount);
-    viewCount = viewCount ? +viewCount + 1 : 1;
+    viewCount = viewCount ? +viewCount + 1 : tour.viewCount + 1;
     await this.cacheManager.set(
       Constant.CACHE_KEY_TOURVIEW + tour.id,
       viewCount,

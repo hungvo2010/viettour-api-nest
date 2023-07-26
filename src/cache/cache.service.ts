@@ -33,8 +33,27 @@ export class CacheService {
             id: key.replace(Constant.CACHE_KEY_TOURVIEW, ''),
           },
           data: {
-            viewCount: {
-              increment: +viewCount,
+            viewCount,
+          },
+        });
+        // await this.cacheManager.set(key, 0);
+      }
+    }
+  }
+
+  @Cron(Constant.EVERY_2_MINUTES, { name: 'CronUpdateLikeCount' })
+  async handleCronUpdateLike() {
+    const keys = await this.cacheManager.store.keys();
+    for (const key of keys) {
+      if (key.startsWith(Constant.CACHE_KEY_TOURLIKE)) {
+        const likeCount = await this.cacheManager.get(key);
+        await this.prismaService.tour.update({
+          where: {
+            id: key.replace(Constant.CACHE_KEY_TOURLIKE, ''),
+          },
+          data: {
+            likeCount: {
+              increment: +likeCount,
             },
           },
         });
