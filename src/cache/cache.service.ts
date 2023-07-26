@@ -38,6 +38,7 @@ export class CacheService {
             },
           },
         });
+        await this.cacheManager.set(key, 0);
       }
     }
   }
