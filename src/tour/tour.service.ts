@@ -20,7 +20,7 @@ export class TourService {
     private readonly prismaService: PrismaService,
     private nativeMongoService: NativeMongoService,
     private cacheService: CacheService,
-  ) {}
+  ) { }
   private readonly logger = new Logger(TourService.name);
 
   async getAllTours({ start, size, ...queryParams }) {
@@ -110,12 +110,25 @@ export class TourService {
       Constant.CACHE_KEY_TOURVIEW + tour.id,
     );
     this.logger.log('viewCount: ', viewCount);
-    viewCount = viewCount ? +viewCount + 1 : +tour.viewCount + 1;
+    viewCount = viewCount ? +viewCount + 1 : 1;
     await this.cacheManager.set(
       Constant.CACHE_KEY_TOURVIEW + tour.id,
       viewCount,
     );
     return viewCount;
+  }
+
+  async handleIncreaseLikeCount(tourId: string, liked: number): Promise<number | undefined> {
+    let likeCount = await this.cacheManager.get(
+      Constant.CACHE_KEY_TOURLIKE + tour.id,
+    );
+    this.logger.log('likeCount: ', likeCount);
+    likeCount = likeCount ? +likeCount + liked : 1;
+    await this.cacheManager.set(
+      Constant.CACHE_KEY_TOURLIKE + tour.id,
+      likeCount,
+    );
+    return likeCount;
   }
 
   async findByEncodeUrl(encodeUrl: string): Promise<Tour | undefined> {
@@ -188,6 +201,10 @@ export class TourService {
     // await this.cacheManager.set(Constant.CACHE_KEY_CREATOR + userId, tours);
     // }
     return tours;
+  }
+
+  async likeTour(tourId, { liked }) {
+    await this.handleIncreaseLikeCount(tourId, liked);
   }
 
   async deleteTour(tourId: string, { userId }) {

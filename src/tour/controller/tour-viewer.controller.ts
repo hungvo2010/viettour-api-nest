@@ -11,10 +11,11 @@ import {
 } from '@nestjs/common';
 import { TourService } from '../tour.service';
 import { GetTourDto } from '../dto/get-tour.dto';
+import { LikeTourDto } from '../dto/like-tour.dto';
 
 @Controller('/v1.0/tours/')
 export class TourViewerController {
-  constructor(private readonly tourService: TourService) {}
+  constructor(private readonly tourService: TourService) { }
   private readonly logger = new Logger(TourViewerController.name);
 
   @Get('all')
@@ -56,6 +57,12 @@ export class TourViewerController {
       item: vrTour,
       timestamp: new Date().toISOString(),
     };
+  }
+
+  @Post(':id/like')
+  async likeTour(@Body() likeTourDto: LikeTourDto, @Param('id') tourId: string) {
+    this.logger.log('Like tour: ' + tourId);
+    await this.tourService.likeTour(tourId, likeTourDto)
   }
 
   @UseGuards(JwtAuthGuard)
