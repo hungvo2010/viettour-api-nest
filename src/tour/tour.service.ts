@@ -9,7 +9,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { Tour, PrivacyStatus } from '@prisma/client';
+import { Tour, PrivacyStatus, EditStatus } from '@prisma/client';
 import { CacheService } from 'src/cache/cache.service';
 import { NativeMongoService } from './controller/native.mongo.service';
 
@@ -59,6 +59,7 @@ export class TourService {
         where: {
           category: queryParams.category,
           privacyStatus: PrivacyStatus.PUBLIC,
+          editStatus: EditStatus.PUBLISHED,
         },
       }),
     ]);
