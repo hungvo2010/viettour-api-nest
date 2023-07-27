@@ -187,6 +187,8 @@ export class TourService {
         id: true,
         name: true,
         address: true,
+        addressName: true,
+        location: true,
         description: true,
         socialImage: true,
         category: true,
