@@ -9,7 +9,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { EmbeddedTour, Tour, PrivacyStatus } from '@prisma/client';
+import { Tour, PrivacyStatus } from '@prisma/client';
 import { CacheService } from 'src/cache/cache.service';
 import { NativeMongoService } from './controller/native.mongo.service';
 
@@ -66,6 +66,10 @@ export class TourService {
 
   async getToursWithFilter(query: string) {
     return await this.nativeMongoService.performFullTextSearch(query);
+  }
+
+  async findToursByAddress(lat: number, lng: number) {
+    return await this.nativeMongoService.performGeoSpatialSearch(lat, lng);
   }
 
   async findOne(tourId: string): Promise<Tour | undefined> {
@@ -171,10 +175,6 @@ export class TourService {
   }
 
   async findByCreator(userId: string): Promise<any[]> {
-    // let tours: EmbeddedTour[];
-    // tours = await this.cacheManager.get(Constant.CACHE_KEY_CREATOR + userId);
-    // this.logger.log('toursByCreator: ', userId);
-    // if (!tours) {
     const tours = await this.prismaService.tour.findMany({
       where: {
         creator: {
@@ -200,9 +200,6 @@ export class TourService {
         editStatus: true,
       },
     });
-
-    // await this.cacheManager.set(Constant.CACHE_KEY_CREATOR + userId, tours);
-    // }
     return tours;
   }
 
@@ -218,7 +215,6 @@ export class TourService {
         id: tourId,
       },
     });
-    // await this.cacheService.deleteCreatorToursCache(userId);
   }
 
   async checkUserPermission(userId: string, tourId: string) {
@@ -263,6 +259,39 @@ export class TourService {
             description: creator.description,
             userCategory: creator.userCategory,
             phoneNumber: creator.phoneNumber,
+          },
+        },
+      });
+    });
+  }
+
+  async batchUpdateAddress() {
+    // todo: write batch update using PrismaService to update tour.address to addressName and location properties in schema.prisma
+    const tours = await this.prismaService.tour.findMany({
+      where: {
+        NOT: {
+          OR: [
+            {
+              address: undefined,
+            },
+            {
+              address: null,
+            },
+          ],
+        },
+      },
+    });
+    this.logger.log('tours: ' + JSON.stringify(tours));
+    tours.forEach(async (tour) => {
+      await this.prismaService.tour.update({
+        where: {
+          id: tour.id,
+        },
+        data: {
+          addressName: tour.address.name,
+          location: {
+            type: 'Point',
+            coordinates: [tour.address.lng, tour.address.lat],
           },
         },
       });

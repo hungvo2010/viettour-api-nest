@@ -32,7 +32,7 @@ async function bootstrap() {
   await prismaService.enableShutdownHooks(app);
 
   // const tourService = app.get(TourService);
-  // await tourService.updateUserFailed();
+  // await tourService.batchUpdateAddress();
 }
 
 function configureApp(app: INestApplication) {
@@ -62,10 +62,5 @@ function configureApp(app: INestApplication) {
   app.use(compression());
   configFirebaseAdmin(app.get(ConfigService));
 }
-
-// function subscribeCacheInvalidation(app: INestApplication) {
-//   const redisService = app.get(RedisService);
-//   redisService.subscribeInvalidateCacheEvent();
-// }
 
 bootstrap();

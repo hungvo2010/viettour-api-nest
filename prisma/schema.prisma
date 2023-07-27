@@ -16,6 +16,8 @@ model User {
   password     String
   fullname     String
   address      Address?
+  addressName  String?
+  location     Location?
   description  String       @default("We don't know much about you, but we're sure you are great and the profile will be completed soon.")
   userCategory UserCategory @default(VIRTUAL_TOUR_ENTHUSIAST)
   company      String?
@@ -30,6 +32,8 @@ model Tour {
   id                  String        @id @default(auto()) @map("_id") @db.ObjectId
   name                String
   address             Address?
+  addressName         String?
+  location            Location?
   description         String        @default("")
   socialImage         String        @default("")
   category            TourCategory  @default(NOT_SET)
@@ -60,6 +64,8 @@ type Creator {
   fullname     String?
   avatarUrl    String?
   address      Address?
+  addressName  String?
+  location     Location?
   description  String?
   userCategory UserCategory?
   phoneNumber  String?
@@ -69,6 +75,8 @@ type EmbeddedTour {
   id          String?
   name        String?
   address     Address?
+  addressName String?
+  location    Location?
   description String?       @default("")
   socialImage String?       @default("")
   category    TourCategory? @default(NOT_SET)
@@ -160,6 +168,11 @@ type Address {
   name String
   lat  Float
   lng  Float
+}
+
+type Location {
+  type        String
+  coordinates Float[]
 }
 
 type Dimension {

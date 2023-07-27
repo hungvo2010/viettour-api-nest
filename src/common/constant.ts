@@ -24,5 +24,6 @@ export class Constant {
   static readonly CACHE_KEY_TOUR: string = 'tour';
   static readonly CACHE_KEY_CREATOR: string = 'creator';
   static readonly CACHE_KEY_ENCODEURL: string = 'encodeUrl';
+  static readonly MAX_DISTANCE: number = 7500; // in meters
   constructor(private readonly configService: ConfigService) {}
 }

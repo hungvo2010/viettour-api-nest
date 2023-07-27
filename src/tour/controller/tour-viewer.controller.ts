@@ -13,6 +13,7 @@ import {
 import { TourService } from '../tour.service';
 import { GetTourDto } from '../dto/get-tour.dto';
 import { LikeTourDto } from '../dto/like-tour.dto';
+import { FindAddressDto } from '../dto/find-address.dto';
 
 @Controller('/v1.0/tours/')
 export class TourViewerController {
@@ -34,6 +35,21 @@ export class TourViewerController {
   async getTourByFilter(@Query('query') query: string) {
     this.logger.log(`getTourByFilter: ${query}`);
     const tours = await this.tourService.getToursWithFilter(query);
+    return {
+      values: tours,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Get('address')
+  async findToursByAddress(@Query() queryDto: FindAddressDto) {
+    this.logger.log(
+      `findToursByAddress: lat: ${queryDto.lat}, lng: ${queryDto.lng}`,
+    );
+    const tours = await this.tourService.findToursByAddress(
+      +queryDto.lat,
+      +queryDto.lng,
+    );
     return {
       values: tours,
       timestamp: new Date().toISOString(),
