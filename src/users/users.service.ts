@@ -151,16 +151,17 @@ export class UsersService {
   async getUserTours(userId: string, initReqUserId: string): Promise<any[]> {
     this.logger.log('initGetUserTours: ' + initReqUserId);
     let tours = await this.tourService.findByCreator(userId);
-    tours = tours.filter((tour) => {
-      if (
-        (tour.privacyStatus === PrivacyStatus.PUBLIC &&
-          tour.editStatus === EditStatus.PUBLISHED) ||
-        tour.creator.userId === initReqUserId
-      ) {
-        return true;
-      }
-      return false;
-    });
+    if (initReqUserId !== userId) {
+      tours = tours.filter((tour) => {
+        if (
+          tour.privacyStatus === PrivacyStatus.PUBLIC &&
+          tour.editStatus === EditStatus.PUBLISHED
+        ) {
+          return true;
+        }
+        return false;
+      });
+    }
     return tours;
   }
 
