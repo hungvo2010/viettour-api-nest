@@ -30,6 +30,7 @@ export class TourService {
         where: {
           category: queryParams.category,
           privacyStatus: PrivacyStatus.PUBLIC,
+          editStatus: EditStatus.PUBLISHED,
         },
       }),
       this.prismaService.tour.findMany({
