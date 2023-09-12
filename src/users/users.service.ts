@@ -48,7 +48,6 @@ export class UsersService {
       'initReqUserId: ' + initReqUserId,
     );
     await this.checkUserPermission(initReqUserId, needUpdateUserId);
-    // return await this.prismaService.$transaction(async () => {
     await this.prismaService.user.update({
       where: {
         id: needUpdateUserId,
@@ -116,8 +115,8 @@ export class UsersService {
     });
   }
 
-  async findByEmail(email: string): Promise<User | undefined> {
-    return this.prismaService.user.findUnique({
+  async findByEmail(email: string) {
+    return await this.prismaService.user.findUnique({
       where: {
         email,
       },
@@ -180,5 +179,11 @@ export class UsersService {
       12,
     )}`;
     return encodeUrl;
+  }
+
+  exclude(user, keys) {
+    return Object.fromEntries(
+      Object.entries(user).filter(([key]) => !keys.includes(key)),
+    );
   }
 }

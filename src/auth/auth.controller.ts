@@ -33,9 +33,8 @@ export class AuthController {
     response
       .status(HttpStatus.OK)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-    const { password, ...user } = req.user;
     response.json({
-      item: user,
+      item: req.user,
       timestamp: new Date().toISOString(),
     });
   }
@@ -80,9 +79,8 @@ export class AuthController {
     response
       .status(HttpStatus.OK)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-    const { password, ...user } = newUser;
     response.json({
-      item: user,
+      item: newUser,
       timestamp: new Date().toISOString(),
     });
   }

@@ -4,16 +4,17 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { RegisterAuthDto } from './dto/register-auth.dto';
 import * as bcrypt from 'bcrypt';
-import { UsersService } from 'src/users/users.service';
+import * as firebaseAdmin from 'firebase-admin';
 import { JwtService } from '@nestjs/jwt';
+
+import { RegisterAuthDto } from './dto/register-auth.dto';
+import { UsersService } from 'src/users/users.service';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { Constant } from 'src/common/constant';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import * as firebaseAdmin from 'firebase-admin';
 
 @Injectable()
 export class AuthService {
@@ -67,8 +68,7 @@ export class AuthService {
       throw new UnauthorizedException('Your email or password is wrong');
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      const { password, ...result } = user;
-      return result;
+      return user;
     }
     throw new UnauthorizedException('Your email or password is wrong');
   }

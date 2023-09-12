@@ -1,11 +1,12 @@
 import { TourCategory } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsEnum } from 'class-validator';
+import { IsNumber, IsOptional, IsEnum, IsDate } from 'class-validator';
 
 export class GetTourDto {
-  @IsNumber()
-  @Type(() => Number)
-  start = 0;
+  @Type(() => Date)
+  @IsDate()
+  @IsOptional()
+  createdAt: Date;
 
   @IsNumber()
   @Type(() => Number)

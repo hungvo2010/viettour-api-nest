@@ -1,5 +1,3 @@
-import { Constant } from 'src/common/constant';
-import { PrismaService } from './../prisma.service';
 import {
   CACHE_MANAGER,
   ForbiddenException,
@@ -9,8 +7,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
+
+import {
+  GET_TOUR_BY_CREATOR_RESPONSE,
+  GET_TOUR_RESPONSE,
+} from './res/get-tour-response';
 import { Tour, PrivacyStatus, EditStatus } from '@prisma/client';
-import { CacheService } from 'src/cache/cache.service';
+import { Constant } from 'src/common/constant';
+import { PrismaService } from 'src/prisma.service';
 import { NativeMongoService } from './controller/native.mongo.service';
 
 @Injectable()
@@ -19,46 +23,30 @@ export class TourService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly prismaService: PrismaService,
     private nativeMongoService: NativeMongoService,
-    private cacheService: CacheService,
   ) {}
   private readonly logger = new Logger(TourService.name);
 
-  async getAllTours({ start, size, ...queryParams }) {
-    this.logger.log(`getAllTours: ${start}, ${size}, ${queryParams.category}`);
+  async getAllTours({ size, category, createdAt }) {
+    this.logger.log(`getAllTours: ${size}, ${category}, ${createdAt}`);
     return await this.prismaService.$transaction([
       this.prismaService.tour.count({
         where: {
-          category: queryParams.category,
+          category,
           privacyStatus: PrivacyStatus.PUBLIC,
           editStatus: EditStatus.PUBLISHED,
         },
       }),
       this.prismaService.tour.findMany({
-        skip: start,
         take: size,
-        select: {
-          name: true,
-          id: true,
-          encodeUrl: true,
-          privacyStatus: true,
-          category: true,
-          address: true,
-          description: true,
-          socialImage: true,
-          creator: {
-            select: {
-              userId: true,
-              fullname: true,
-              avatarUrl: true,
-              address: true,
-            },
+        ...(createdAt && {
+          cursor: {
+            createdAt,
           },
-          likeCount: true,
-          viewCount: true,
-          createdAt: true,
-        },
+          skip: 1,
+        }),
+        select: GET_TOUR_RESPONSE,
         where: {
-          category: queryParams.category,
+          category: category,
           privacyStatus: PrivacyStatus.PUBLIC,
           editStatus: EditStatus.PUBLISHED,
         },
@@ -78,7 +66,7 @@ export class TourService {
     let tour: Tour = null;
     tour = await this.cacheManager.get(Constant.CACHE_KEY_TOUR + tourId);
     if (!tour) {
-      this.logger.log('tour not cached: ', tourId);
+      this.logger.log('Tour not cached: ', tourId);
       tour = await this.prismaService.tour.findFirst({
         where: {
           id: tourId,
@@ -185,24 +173,7 @@ export class TourService {
           },
         },
       },
-      select: {
-        id: true,
-        name: true,
-        address: true,
-        addressName: true,
-        location: true,
-        description: true,
-        socialImage: true,
-        category: true,
-        createdAt: true,
-        modifiedAt: true,
-        encodeUrl: true,
-        likeCount: true,
-        viewCount: true,
-        creator: true,
-        privacyStatus: true,
-        editStatus: true,
-      },
+      select: GET_TOUR_BY_CREATOR_RESPONSE,
     });
     return tours;
   }

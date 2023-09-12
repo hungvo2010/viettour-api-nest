@@ -1,0 +1,40 @@
+export const GET_TOUR_RESPONSE = {
+  name: true,
+  id: true,
+  encodeUrl: true,
+  privacyStatus: true,
+  category: true,
+  address: true,
+  description: true,
+  socialImage: true,
+  creator: {
+    select: {
+      userId: true,
+      fullname: true,
+      avatarUrl: true,
+      address: true,
+    },
+  },
+  likeCount: true,
+  viewCount: true,
+  createdAt: true,
+};
+
+export const GET_TOUR_BY_CREATOR_RESPONSE = {
+  id: true,
+  name: true,
+  address: true,
+  addressName: true,
+  location: true,
+  description: true,
+  socialImage: true,
+  category: true,
+  createdAt: true,
+  modifiedAt: true,
+  encodeUrl: true,
+  likeCount: true,
+  viewCount: true,
+  creator: true,
+  privacyStatus: true,
+  editStatus: true,
+};

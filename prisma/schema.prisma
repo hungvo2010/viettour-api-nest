@@ -50,7 +50,7 @@ model Tour {
   textColor           String?       @default("#fff")
   enableAutoRotate    Boolean       @default(false)
   autoRotateSpeed     Float         @default(0.0)
-  createdAt           DateTime      @default(now())
+  createdAt           DateTime      @unique @default(now())
   modifiedAt          DateTime      @default(now())
   autoHideInfospot    Boolean       @default(false)
   autoHideShareButton Boolean       @default(false)
