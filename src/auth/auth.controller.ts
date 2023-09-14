@@ -56,10 +56,10 @@ export class AuthController {
     response
       .status(HttpStatus.CREATED)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-    response.json({
+    return {
       item: excludeField(user, ['password']),
       timestamp: new Date().toISOString(),
-    });
+    };
   }
 
   @Get('/google/login')
@@ -79,10 +79,10 @@ export class AuthController {
     response
       .status(HttpStatus.OK)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-    response.json({
+    return {
       item: newUser,
       timestamp: new Date().toISOString(),
-    });
+    };
   }
 
   @Post('/facebook/redirect')
@@ -96,10 +96,10 @@ export class AuthController {
     response
       .status(HttpStatus.OK)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-    response.json({
+    return {
       item: excludeField(newUser, ['password']),
       timestamp: new Date().toISOString(),
-    });
+    };
   }
 
   @Post('/change-password')
