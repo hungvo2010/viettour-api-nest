@@ -6,11 +6,11 @@ import {
   Request,
   Body,
   Res,
-  UnprocessableEntityException,
   HttpStatus,
   Logger,
   HttpCode,
   Get,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
@@ -46,7 +46,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     if (registerDto.password !== registerDto.confirmPassword) {
-      throw new UnprocessableEntityException(
+      throw new BadRequestException(
         'Password and confirm password are not the same',
       );
     }
@@ -110,7 +110,7 @@ export class AuthController {
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
     if (changePasswordDto.newPassword !== changePasswordDto.confirmPassword) {
-      throw new UnprocessableEntityException(
+      throw new BadRequestException(
         'Password and confirm password are not the same',
       );
     }
