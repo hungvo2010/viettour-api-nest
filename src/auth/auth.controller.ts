@@ -20,6 +20,7 @@ import { Constant } from 'src/common/constant';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { IdTokenDto } from './dto/IdToken.dto';
+import { excludeField } from 'src/common/utils';
 
 @Controller('/v1.0/auth')
 export class AuthController {
@@ -33,10 +34,10 @@ export class AuthController {
     response
       .status(HttpStatus.OK)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-    response.json({
+    return {
       item: req.user,
       timestamp: new Date().toISOString(),
-    });
+    };
   }
 
   @Post('/register')
@@ -55,9 +56,8 @@ export class AuthController {
     response
       .status(HttpStatus.CREATED)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-    const { password, ...newUser } = user;
     response.json({
-      item: newUser,
+      item: excludeField(user, ['password']),
       timestamp: new Date().toISOString(),
     });
   }
@@ -96,9 +96,8 @@ export class AuthController {
     response
       .status(HttpStatus.OK)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-    const { password, ...user } = newUser;
     response.json({
-      item: user,
+      item: excludeField(newUser, ['password']),
       timestamp: new Date().toISOString(),
     });
   }

@@ -1,3 +1,4 @@
+import { GetTourDto } from './dto/get-tour.dto';
 import {
   CACHE_MANAGER,
   ForbiddenException,
@@ -26,7 +27,8 @@ export class TourService {
   ) {}
   private readonly logger = new Logger(TourService.name);
 
-  async getAllTours({ size, category, createdAt }) {
+  async getAllTours(queryParams: GetTourDto) {
+    const { size, category, createdAt } = queryParams;
     this.logger.log(`getAllTours: ${size}, ${category}, ${createdAt}`);
     return await this.prismaService.$transaction([
       this.prismaService.tour.count({
@@ -46,7 +48,7 @@ export class TourService {
         }),
         select: GET_TOUR_RESPONSE,
         where: {
-          category: category,
+          category,
           privacyStatus: PrivacyStatus.PUBLIC,
           editStatus: EditStatus.PUBLISHED,
         },
