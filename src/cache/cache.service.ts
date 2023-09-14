@@ -1,5 +1,5 @@
 import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { Cache } from 'cache-manager';
 import { Constant } from 'src/common/constant';
 import { PrismaService } from 'src/prisma.service';
