@@ -102,9 +102,9 @@ export class TourService {
   }
 
   async handleIncreaseViewCount(tour: Tour): Promise<number | undefined> {
-    let viewCount = await this.cacheManager.get(
+    let viewCount = (await this.cacheManager.get(
       Constant.CACHE_KEY_TOURVIEW + tour.id,
-    );
+    )) as number;
     this.logger.log('viewCount: ', viewCount);
     viewCount = viewCount ? +viewCount + 1 : tour.viewCount + 1;
     await this.cacheManager.set(
@@ -118,9 +118,9 @@ export class TourService {
     tourId: string,
     liked: number,
   ): Promise<number | undefined> {
-    let likeCount = await this.cacheManager.get(
+    let likeCount = (await this.cacheManager.get(
       Constant.CACHE_KEY_TOURLIKE + tourId,
-    );
+    )) as number;
     this.logger.log('likeCount: ', likeCount);
     likeCount = likeCount ? +likeCount + liked : 1;
     await this.cacheManager.set(
@@ -159,10 +159,10 @@ export class TourService {
     return tour;
   }
 
-  async getTourIdByEncodeUrl(url: string) {
-    const tourId = await this.cacheManager.get(
+  async getTourIdByEncodeUrl(url: string): Promise<string> {
+    const tourId = (await this.cacheManager.get(
       Constant.CACHE_KEY_ENCODEURL + url,
-    );
+    )) as string;
     return tourId;
   }
 

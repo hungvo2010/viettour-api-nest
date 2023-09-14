@@ -16,7 +16,7 @@ export class Constant {
     sameSite: 'none',
   };
   static readonly REDIS_PORT: number = 6379;
-  static readonly REDIS_TTL: number = 60 * 60; // v4 cache-manager in seconds
+  static readonly REDIS_TTL: number = 60 * 60 * 1000; // v4 cache-manager in seconds
 
   static readonly CACHE_KEY_TOURVIEW: string = 'view';
   static readonly CACHE_KEY_TOURLIKE: string = 'like';
