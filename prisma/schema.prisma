@@ -24,39 +24,46 @@ model User {
   phoneNumber  String?
   avatarUrl    String       @default("https://res.cloudinary.com/dpn7tctut/image/upload/v1687445957/aoa4jflsuikz3wviwete.png")
   coverUrl     String       @default("https://www.klapty.com/public/assets/img/default-cover.png")
-
-  tours EmbeddedTour[]
+  tours        Tour[]
 }
 
 model Tour {
-  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
-  name                String
-  address             Address?
-  addressName         String?
-  location            Location?
-  description         String        @default("")
-  socialImage         String        @default("")
-  category            TourCategory  @default(NOT_SET)
-  creator             Creator
-  logoUrl             String?
-  soundOption         String?       @default("No Sound")
-  privacyStatus       PrivacyStatus @default(PUBLIC)
-  editStatus          EditStatus    @default(DRAFT)
-  likeCount           Int           @default(0)
-  viewCount           Int           @default(0)
-  encodeUrl           String?       @unique
-  isPasswordProtected Boolean       @default(false)
-  password            String?
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  address     Address?
+  addressName String?
+  location    Location?
+  description String        @default("")
+  socialImage String        @default("")
+  category    TourCategory  @default(NOT_SET)
+  encodeUrl   String?       @unique
+  config      TourConfig
+  statistic   TourStatistic
+  createdAt   DateTime      @default(now())
+  modifiedAt  DateTime      @default(now())
+  floorPlan   FloorPlan?
+  creator     User          @relation(fields: [creatorId], references: [id])
+  creatorId   String        @db.ObjectId
+  scenes      SceneTour[]
+}
+
+type TourConfig {
   textColor           String?       @default("#fff")
+  soundOption         String?       @default("No Sound")
   enableAutoRotate    Boolean       @default(false)
   autoRotateSpeed     Float         @default(0.0)
-  createdAt           DateTime      @unique @default(now())
-  modifiedAt          DateTime      @default(now())
   autoHideInfospot    Boolean       @default(false)
   autoHideShareButton Boolean       @default(false)
   lockHorizontalView  Boolean       @default(false)
-  floorPlan           FloorPlan?
-  scenes              SceneTour[]
+  privacyStatus       PrivacyStatus @default(PUBLIC)
+  editStatus          EditStatus    @default(DRAFT)
+  isPasswordProtected Boolean       @default(false)
+  password            String?
+}
+
+type TourStatistic {
+  likeCount Int @default(0)
+  viewCount Int @default(0)
 }
 
 type Creator {
@@ -91,9 +98,7 @@ model Scene {
   is2D             Boolean     @default(false)
   thumbnailUrl     String?
   hotspotUrl       String?
-  arrivalX         Float       @default(0.0)
-  arrivalY         Float       @default(0.0)
-  arrivalZ         Float       @default(1)
+  config           SceneConfig
   dateUploaded     DateTime    @default(now())
   dateModified     DateTime    @default(now())
   dimensions       Dimension?
@@ -101,6 +106,12 @@ model Scene {
   previousHotspots Hotspot[]   @relation("Next Scene")
   containHotspots  Hotspot[]   @relation("Contain Scene")
   tours            SceneTour[]
+}
+
+type SceneConfig {
+  arrivalX Float @default(0.0)
+  arrivalY Float @default(0.0)
+  arrivalZ Float @default(1)
 }
 
 model SceneTour {
@@ -115,25 +126,29 @@ model SceneTour {
 }
 
 model Hotspot {
-  id             String                @id @default(auto()) @map("_id") @db.ObjectId
-  scale          Float                 @default(1.0)
-  opacity        Float                 @default(1.0)
-  rotateDegree   Float                 @default(0.0)
-  x              Float                 @default(0.0)
-  y              Float                 @default(0.0)
-  z              Float                 @default(0.0)
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  config         HotspotConfig
   title          String?
   description    String?
   link           String?
   imageUrl       String?
   soundUrl       String?
-  type           HotspotType           @default(INFO)
-  hotspotStyle   EmbeddedHotspotStyle?
+  type           HotspotType     @default(INFO)
   transitionType TransitionType?
-  containScene   Scene?                @relation("Contain Scene", fields: [containSceneId], references: [id], onDelete: Cascade)
-  containSceneId String?               @db.ObjectId
-  nextScene      Scene?                @relation("Next Scene", fields: [nextSceneId], references: [id])
-  nextSceneId    String?               @db.ObjectId
+  containScene   Scene?          @relation("Contain Scene", fields: [containSceneId], references: [id], onDelete: Cascade)
+  containSceneId String?         @db.ObjectId
+  nextScene      Scene?          @relation("Next Scene", fields: [nextSceneId], references: [id])
+  nextSceneId    String?         @db.ObjectId
+}
+
+type HotspotConfig {
+  scale        Float                 @default(1.0)
+  opacity      Float                 @default(1.0)
+  rotateDegree Float                 @default(0.0)
+  x            Float                 @default(0.0)
+  y            Float                 @default(0.0)
+  z            Float                 @default(0.0)
+  hotspotStyle EmbeddedHotspotStyle?
 }
 
 type EmbeddedHotspotStyle {

@@ -33,7 +33,13 @@ export class CacheService {
             id: key.replace(Constant.CACHE_KEY_TOURVIEW, ''),
           },
           data: {
-            viewCount,
+            statistic: {
+              update: {
+                viewCount: {
+                  increment: +viewCount,
+                },
+              },
+            },
           },
         });
         // await this.cacheManager.set(key, 0);
@@ -52,8 +58,12 @@ export class CacheService {
             id: key.replace(Constant.CACHE_KEY_TOURLIKE, ''),
           },
           data: {
-            likeCount: {
-              increment: +likeCount,
+            statistic: {
+              update: {
+                likeCount: {
+                  increment: +likeCount,
+                },
+              },
             },
           },
         });

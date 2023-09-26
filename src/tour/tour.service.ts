@@ -1,4 +1,3 @@
-import { GetTourDto } from './dto/get-tour.dto';
 import {
   CACHE_MANAGER,
   ForbiddenException,
@@ -9,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
+import { GetTourDto } from './dto/get-tour.dto';
 import {
   GET_TOUR_BY_CREATOR_RESPONSE,
   GET_TOUR_RESPONSE,
@@ -28,29 +28,36 @@ export class TourService {
   private readonly logger = new Logger(TourService.name);
 
   async getAllTours(queryParams: GetTourDto) {
-    const { size, category, createdAt } = queryParams;
-    this.logger.log(`getAllTours: ${size}, ${category}, ${createdAt}`);
+    this.logger.log(`getAllTours: ${JSON.stringify(queryParams)}`);
     return await this.prismaService.$transaction([
       this.prismaService.tour.count({
         where: {
-          category,
-          privacyStatus: PrivacyStatus.PUBLIC,
-          editStatus: EditStatus.PUBLISHED,
+          category: queryParams.category,
+          config: {
+            is: {
+              privacyStatus: PrivacyStatus.PUBLIC,
+              editStatus: EditStatus.PUBLISHED,
+            },
+          },
         },
       }),
       this.prismaService.tour.findMany({
-        take: size,
-        ...(createdAt && {
+        take: queryParams.size,
+        ...(queryParams.cursorValue && {
           cursor: {
-            createdAt,
+            ...queryParams.cursorValue,
           },
           skip: 1,
         }),
         select: GET_TOUR_RESPONSE,
         where: {
-          category,
-          privacyStatus: PrivacyStatus.PUBLIC,
-          editStatus: EditStatus.PUBLISHED,
+          category: queryParams.category,
+          config: {
+            is: {
+              editStatus: EditStatus.PUBLISHED,
+              privacyStatus: PrivacyStatus.PUBLIC,
+            },
+          },
         },
       }),
     ]);
@@ -72,14 +79,18 @@ export class TourService {
       tour = await this.prismaService.tour.findFirst({
         where: {
           id: tourId,
-          OR: [
-            {
-              privacyStatus: PrivacyStatus.PUBLIC,
+          config: {
+            is: {
+              OR: [
+                {
+                  privacyStatus: PrivacyStatus.PUBLIC,
+                },
+                {
+                  privacyStatus: PrivacyStatus.UNLISTED,
+                },
+              ],
             },
-            {
-              privacyStatus: PrivacyStatus.UNLISTED,
-            },
-          ],
+          },
         },
         include: {
           scenes: {
@@ -106,7 +117,7 @@ export class TourService {
       Constant.CACHE_KEY_TOURVIEW + tour.id,
     )) as number;
     this.logger.log('viewCount: ', viewCount);
-    viewCount = viewCount ? +viewCount + 1 : tour.viewCount + 1;
+    viewCount = viewCount ? +viewCount + 1 : tour.statistic.viewCount + 1;
     await this.cacheManager.set(
       Constant.CACHE_KEY_TOURVIEW + tour.id,
       viewCount,
@@ -144,7 +155,7 @@ export class TourService {
           encodeUrl: url,
         },
       });
-      tour = tour.privacyStatus === PrivacyStatus.PUBLIC ? tour : null;
+      tour = tour.config.privacyStatus === PrivacyStatus.PUBLIC ? tour : null;
       if (tour) {
         await this.cacheManager.set(
           Constant.CACHE_KEY_ENCODEURL + url,
@@ -154,7 +165,7 @@ export class TourService {
       }
     }
     if (tour) {
-      tour.viewCount = await this.handleIncreaseViewCount(tour);
+      tour.statistic.viewCount = await this.handleIncreaseViewCount(tour);
     }
     return tour;
   }
@@ -169,11 +180,7 @@ export class TourService {
   async findByCreator(userId: string): Promise<any[]> {
     const tours = await this.prismaService.tour.findMany({
       where: {
-        creator: {
-          is: {
-            userId,
-          },
-        },
+        creatorId: userId,
       },
       select: GET_TOUR_BY_CREATOR_RESPONSE,
     });
@@ -201,46 +208,42 @@ export class TourService {
       },
     });
     if (!tour) throw new NotFoundException('Tour not found');
-    if (tour?.creator?.userId !== userId)
+    if (tour?.creatorId !== userId)
       throw new ForbiddenException('Wrong permission');
   }
 
-  async updateUserFailed() {
-    const creator = await this.prismaService.user.findUnique({
-      where: {
-        id: '643eb17f10cf8fc98ca2db2b',
-      },
-    });
-    this.logger.log('creator: ' + JSON.stringify(creator));
-    const tours = await this.prismaService.tour.findMany({
-      where: {
-        creator: {
-          is: {
-            userId: undefined,
-          },
-        },
-      },
-    });
-    this.logger.log('tours: ' + JSON.stringify(tours));
-    tours.forEach(async (tour) => {
-      await this.prismaService.tour.update({
-        where: {
-          id: tour.id,
-        },
-        data: {
-          creator: {
-            userId: creator.id,
-            fullname: creator.fullname,
-            avatarUrl: creator.avatarUrl,
-            address: creator.address,
-            description: creator.description,
-            userCategory: creator.userCategory,
-            phoneNumber: creator.phoneNumber,
-          },
-        },
-      });
-    });
-  }
+  // async updateUserFailed() {
+  //   const creator = await this.prismaService.user.findUnique({
+  //     where: {
+  //       id: '643eb17f10cf8fc98ca2db2b',
+  //     },
+  //   });
+  //   this.logger.log('creator: ' + JSON.stringify(creator));
+  //   const tours = await this.prismaService.tour.findMany({
+  //     where: {
+  //       creatorId: undefined,
+  //     },
+  //   });
+  //   this.logger.log('tours: ' + JSON.stringify(tours));
+  //   tours.forEach(async (tour) => {
+  //     await this.prismaService.tour.update({
+  //       where: {
+  //         id: tour.id,
+  //       },
+  //       data: {
+  //         creator: {
+  //           creat: creator.id,
+  //           fullname: creator.fullname,
+  //           avatarUrl: creator.avatarUrl,
+  //           address: creator.address,
+  //           description: creator.description,
+  //           userCategory: creator.userCategory,
+  //           phoneNumber: creator.phoneNumber,
+  //         },
+  //       },
+  //     });
+  //   });
+  // }
 
   async batchUpdateAddress() {
     // todo: write batch update using PrismaService to update tour.address to addressName and location properties in schema.prisma

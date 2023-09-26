@@ -1,22 +1,30 @@
 export const GET_TOUR_RESPONSE = {
-  name: true,
   id: true,
-  encodeUrl: true,
-  privacyStatus: true,
-  category: true,
   address: true,
+  name: true,
+  encodeUrl: true,
+  config: {
+    select: {
+      privacyStatus: true,
+    },
+  },
+  category: true,
   description: true,
   socialImage: true,
   creator: {
     select: {
-      userId: true,
+      id: true,
       fullname: true,
       avatarUrl: true,
       address: true,
     },
   },
-  likeCount: true,
-  viewCount: true,
+  statistic: {
+    select: {
+      likeCount: true,
+      viewCount: true,
+    },
+  },
   createdAt: true,
 };
 
