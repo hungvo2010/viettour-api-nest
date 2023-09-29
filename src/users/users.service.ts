@@ -11,7 +11,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User, PrivacyStatus, EditStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-import { Constant } from 'src/common/constant';
 
 @Injectable()
 export class UsersService {
@@ -38,7 +37,7 @@ export class UsersService {
     return this.findByUserId(user.userId);
   }
 
-  async update(
+  async updateUser(
     needUpdateUserId: string,
     initReqUserId: string,
     { email, password, ...updateUserDto }: UpdateUserDto,
@@ -54,40 +53,6 @@ export class UsersService {
       },
       data: updateUserDto,
     });
-    const tours = await this.prismaService.tour.findMany({
-      where: {
-        creator: {
-          is: {
-            userId: needUpdateUserId,
-          },
-        },
-      },
-    });
-    this.logger.log(tours);
-    tours.forEach(async (tour) => {
-      this.logger.log('tour: ' + tour.id);
-      await this.cacheManager.del(Constant.CACHE_KEY_TOUR + tour.id);
-      await this.cacheManager.del(
-        Constant.CACHE_KEY_ENCODEURL + tour.encodeUrl,
-      );
-      await this.prismaService.tour.update({
-        where: {
-          id: tour.id,
-        },
-        data: {
-          creator: {
-            ...tour.creator,
-            fullname: updateUserDto.fullname,
-          },
-          encodeUrl: this.buildTourEncodeUrl(
-            tour.name,
-            updateUserDto.fullname,
-            tour.id,
-          ),
-        },
-      });
-    });
-    // });
   }
 
   async updateOrCreate(user: any) {
@@ -131,21 +96,6 @@ export class UsersService {
     });
     return user;
   }
-
-  // async findByUserIdIncludeTours(userId: string): Promise<User | undefined> {
-  //   const user = await this.findByUserId(userId);
-  //   let allUserTours = await this.getUserTours(userId);
-  //   allUserTours = allUserTours.filter((tour) => {
-  //     if (
-  //       tour.privacyStatus === PrivacyStatus.PUBLIC ||
-  //       tour.creator.id === userId
-  //     ) {
-  //       return true;
-  //     }
-  //   });
-  //   user.tours = allUserTours;
-  //   return user;
-  // }
 
   async getUserTours(userId: string, initReqUserId: string): Promise<any[]> {
     this.logger.log('initGetUserTours: ' + initReqUserId);

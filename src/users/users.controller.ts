@@ -58,7 +58,7 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @Request() req,
   ) {
-    await this.usersService.update(userId, req.user.userId, updateUserDto);
+    await this.usersService.updateUser(userId, req.user.userId, updateUserDto);
     return {
       message: 'Update user successfully',
       timestamp: new Date().toISOString(),
