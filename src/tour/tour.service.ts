@@ -87,7 +87,6 @@ export class TourService {
       Constant.CACHE_KEY_TOURVIEW,
       tour.id,
     ));
-    this.logger.log('viewCount: ', viewCount);
     viewCount = viewCount ? +viewCount + 1 : tour.statistic.viewCount + 1;
     await this.cacheService.addItemToCache(
       Constant.CACHE_KEY_TOURVIEW,
@@ -119,11 +118,11 @@ export class TourService {
     const url = encodeURI(encodeUrl);
     this.logger.log(`findByEncodeUrl: ${url}`);
     let tour: Tour;
-    const tourId = await this.getTourIdByEncodeUrl(url);
-    this.logger.log('tourId: ', tourId);
-    if (tourId) {
-      tour = await this.findOne(tourId);
-    } else {
+    tour = (await this.cacheService.getItemFromCache(
+      Constant.CACHE_KEY_ENCODEURL,
+      url,
+    )) as Tour;
+    if (!tour) {
       tour = await this.prismaService.tour.findUnique({
         where: {
           encodeUrl: url,
@@ -131,24 +130,17 @@ export class TourService {
       });
       tour = tour.config.privacyStatus === PrivacyStatus.PUBLIC ? tour : null;
       if (tour) {
-        await this.cacheManager.set(
-          Constant.CACHE_KEY_ENCODEURL + url,
-          tour.id,
+        await this.cacheService.addItemToCache(
+          Constant.CACHE_KEY_ENCODEURL,
+          url,
+          tour,
         );
-        // await this.cacheManager.set(Constant.CACHE_KEY_TOUR + tour.id, tour);
       }
     }
     if (tour) {
       tour.statistic.viewCount = await this.handleIncreaseViewCount(tour);
     }
     return tour;
-  }
-
-  async getTourIdByEncodeUrl(url: string): Promise<string> {
-    const tourId = (await this.cacheManager.get(
-      Constant.CACHE_KEY_ENCODEURL + url,
-    )) as string;
-    return tourId;
   }
 
   async deleteTour(tourId: string, userId: string) {
@@ -212,6 +204,13 @@ export class TourService {
 
   async getTourFromCache(tourId: string): Promise<Tour | undefined> {
     return await this.cacheManager.get(Constant.CACHE_KEY_TOUR + tourId);
+  }
+
+  async getTourIdByEncodeUrl(url: string): Promise<string> {
+    return (await this.cacheService.getItemFromCache(
+      Constant.CACHE_KEY_ENCODEURL,
+      url,
+    )) as string;
   }
 
   // async batchUpdateAddress() {

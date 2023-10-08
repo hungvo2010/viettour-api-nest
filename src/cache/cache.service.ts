@@ -17,7 +17,7 @@ export class CacheService {
   }
 
   async getItemFromCache(keyPrefix: string, key: string) {
-    await this.cacheManager.get(keyPrefix + key);
+    return await this.cacheManager.get(keyPrefix + key);
   }
 
   async addItemToCache(keyPrefix: string, key: string, value) {
