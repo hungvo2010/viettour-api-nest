@@ -203,7 +203,10 @@ export class TourService {
   }
 
   async getTourFromCache(tourId: string): Promise<Tour | undefined> {
-    return await this.cacheManager.get(Constant.CACHE_KEY_TOUR + tourId);
+    return (await this.cacheService.getItemFromCache(
+      Constant.CACHE_KEY_TOUR,
+      tourId,
+    )) as Tour;
   }
 
   async getTourIdByEncodeUrl(url: string): Promise<string> {
