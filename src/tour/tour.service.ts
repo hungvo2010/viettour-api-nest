@@ -13,10 +13,12 @@ import {
   GET_TOUR_BY_CREATOR_RESPONSE,
   GET_TOUR_RESPONSE,
 } from './res/get-tour-response';
-import { Tour, PrivacyStatus, EditStatus } from '@prisma/client';
+import { Tour, PrivacyStatus, EditStatus, TourCategory } from '@prisma/client';
 import { Constant } from 'src/common/constant';
 import { PrismaService } from 'src/prisma.service';
 import { NativeMongoService } from './controller/native.mongo.service';
+import { CacheService } from 'src/cache/cache.service';
+import { FIND_ONE_CONFIG_CONDITION } from './tour.constant';
 
 @Injectable()
 export class TourService {
@@ -24,6 +26,7 @@ export class TourService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly prismaService: PrismaService,
     private nativeMongoService: NativeMongoService,
+    private readonly cacheService: CacheService,
   ) {}
   private readonly logger = new Logger(TourService.name);
 
@@ -31,34 +34,12 @@ export class TourService {
     this.logger.log(`getAllTours: ${JSON.stringify(queryParams)}`);
     return await this.prismaService.$transaction([
       this.prismaService.tour.count({
-        where: {
-          category: queryParams.category,
-          config: {
-            is: {
-              privacyStatus: PrivacyStatus.PUBLIC,
-              editStatus: EditStatus.PUBLISHED,
-            },
-          },
-        },
+        where: this.publicToursByCategoryCondition(queryParams.category),
       }),
       this.prismaService.tour.findMany({
-        take: queryParams.size,
-        ...(queryParams.cursorValue && {
-          cursor: {
-            ...queryParams.cursorValue,
-          },
-          skip: 1,
-        }),
+        ...this.buildCursorParams(queryParams.size, queryParams.cursor),
         select: GET_TOUR_RESPONSE,
-        where: {
-          category: queryParams.category,
-          config: {
-            is: {
-              editStatus: EditStatus.PUBLISHED,
-              privacyStatus: PrivacyStatus.PUBLIC,
-            },
-          },
-        },
+        where: this.publicToursByCategoryCondition(queryParams.category),
       }),
     ]);
   }
@@ -73,24 +54,13 @@ export class TourService {
 
   async findOne(tourId: string): Promise<Tour | undefined> {
     let tour: Tour = null;
-    tour = await this.cacheManager.get(Constant.CACHE_KEY_TOUR + tourId);
+    tour = await this.getTourFromCache(tourId);
     if (!tour) {
-      this.logger.log('Tour not cached: ', tourId);
+      this.logger.log('Tour cache missed: ', tourId);
       tour = await this.prismaService.tour.findFirst({
         where: {
           id: tourId,
-          config: {
-            is: {
-              OR: [
-                {
-                  privacyStatus: PrivacyStatus.PUBLIC,
-                },
-                {
-                  privacyStatus: PrivacyStatus.UNLISTED,
-                },
-              ],
-            },
-          },
+          ...FIND_ONE_CONFIG_CONDITION,
         },
         include: {
           scenes: {
@@ -107,19 +77,21 @@ export class TourService {
           },
         },
       });
-      await this.cacheManager.set(Constant.CACHE_KEY_TOUR + tourId, tour);
+      this.cacheService.addItemToCache(Constant.CACHE_KEY_TOUR, tourId, tour);
     }
     return tour;
   }
 
   async handleIncreaseViewCount(tour: Tour): Promise<number | undefined> {
-    let viewCount = (await this.cacheManager.get(
-      Constant.CACHE_KEY_TOURVIEW + tour.id,
-    )) as number;
+    let viewCount = +(await this.cacheService.getItemFromCache(
+      Constant.CACHE_KEY_TOURVIEW,
+      tour.id,
+    ));
     this.logger.log('viewCount: ', viewCount);
     viewCount = viewCount ? +viewCount + 1 : tour.statistic.viewCount + 1;
-    await this.cacheManager.set(
-      Constant.CACHE_KEY_TOURVIEW + tour.id,
+    await this.cacheService.addItemToCache(
+      Constant.CACHE_KEY_TOURVIEW,
+      tour.id,
       viewCount,
     );
     return viewCount;
@@ -129,13 +101,15 @@ export class TourService {
     tourId: string,
     liked: number,
   ): Promise<number | undefined> {
-    let likeCount = (await this.cacheManager.get(
-      Constant.CACHE_KEY_TOURLIKE + tourId,
-    )) as number;
+    let likeCount = +(await this.cacheService.getItemFromCache(
+      Constant.CACHE_KEY_TOURLIKE,
+      tourId,
+    ));
     this.logger.log('likeCount: ', likeCount);
     likeCount = likeCount ? +likeCount + liked : 1;
-    await this.cacheManager.set(
-      Constant.CACHE_KEY_TOURLIKE + tourId,
+    await this.cacheService.addItemToCache(
+      Constant.CACHE_KEY_TOURLIKE,
+      tourId,
       likeCount,
     );
     return likeCount;
@@ -177,6 +151,16 @@ export class TourService {
     return tourId;
   }
 
+  async deleteTour(tourId: string, userId: string) {
+    this.logger.log(`deleteTour: ${tourId} of user ${userId}`);
+    await this.checkUserPermission(userId, tourId);
+    await this.prismaService.tour.delete({
+      where: {
+        id: tourId,
+      },
+    });
+  }
+
   async findByCreator(userId: string): Promise<any[]> {
     const tours = await this.prismaService.tour.findMany({
       where: {
@@ -187,41 +171,63 @@ export class TourService {
     return tours;
   }
 
-  async likeTour(tourId: string, { liked }) {
+  async likeTour(tourId: string, liked) {
     await this.handleIncreaseLikeCount(tourId, liked);
   }
 
-  async deleteTour(tourId: string, { userId }) {
-    this.logger.log(`deleteTour: ${tourId} of user ${userId}`);
-    await this.checkUserPermission(userId, tourId);
-    await this.prismaService.tour.delete({
-      where: {
-        id: tourId,
-      },
-    });
-  }
-
   async checkUserPermission(userId: string, tourId: string) {
-    const tour = await this.prismaService.tour.findUnique({
-      where: {
-        id: tourId,
-      },
-    });
+    const tour = await this.findTourById(tourId);
     if (!tour) throw new NotFoundException('Tour not found');
     if (tour?.creatorId !== userId)
       throw new ForbiddenException('Wrong permission');
   }
 
-  // async updateUserFailed() {
-  //   const creator = await this.prismaService.user.findUnique({
-  //     where: {
-  //       id: '643eb17f10cf8fc98ca2db2b',
-  //     },
-  //   });
-  //   this.logger.log('creator: ' + JSON.stringify(creator));
+  async findTourById(tourId: string) {
+    return await this.prismaService.tour.findUnique({
+      where: {
+        id: tourId,
+      },
+    });
+  }
+
+  buildCursorParams(size: number, cursor: string) {
+    return {
+      take: size,
+      ...(cursor && { cursor: { id: cursor } }),
+      skip: 1,
+    };
+  }
+
+  publicToursByCategoryCondition(category: TourCategory) {
+    return {
+      category,
+      config: {
+        is: {
+          privacyStatus: PrivacyStatus.PUBLIC,
+          editStatus: EditStatus.PUBLISHED,
+        },
+      },
+    };
+  }
+
+  async getTourFromCache(tourId: string): Promise<Tour | undefined> {
+    return await this.cacheManager.get(Constant.CACHE_KEY_TOUR + tourId);
+  }
+
+  // async batchUpdateAddress() {
+  //   // todo: write batch update using PrismaService to update tour.address to addressName and location properties in schema.prisma
   //   const tours = await this.prismaService.tour.findMany({
   //     where: {
-  //       creatorId: undefined,
+  //       NOT: {
+  //         OR: [
+  //           {
+  //             address: undefined,
+  //           },
+  //           {
+  //             address: null,
+  //           },
+  //         ],
+  //       },
   //     },
   //   });
   //   this.logger.log('tours: ' + JSON.stringify(tours));
@@ -231,50 +237,13 @@ export class TourService {
   //         id: tour.id,
   //       },
   //       data: {
-  //         creator: {
-  //           creat: creator.id,
-  //           fullname: creator.fullname,
-  //           avatarUrl: creator.avatarUrl,
-  //           address: creator.address,
-  //           description: creator.description,
-  //           userCategory: creator.userCategory,
-  //           phoneNumber: creator.phoneNumber,
+  //         addressName: tour.address.name,
+  //         location: {
+  //           type: 'Point',
+  //           coordinates: [tour.address.lng, tour.address.lat],
   //         },
   //       },
   //     });
   //   });
   // }
-
-  async batchUpdateAddress() {
-    // todo: write batch update using PrismaService to update tour.address to addressName and location properties in schema.prisma
-    const tours = await this.prismaService.tour.findMany({
-      where: {
-        NOT: {
-          OR: [
-            {
-              address: undefined,
-            },
-            {
-              address: null,
-            },
-          ],
-        },
-      },
-    });
-    this.logger.log('tours: ' + JSON.stringify(tours));
-    tours.forEach(async (tour) => {
-      await this.prismaService.tour.update({
-        where: {
-          id: tour.id,
-        },
-        data: {
-          addressName: tour.address.name,
-          location: {
-            type: 'Point',
-            coordinates: [tour.address.lng, tour.address.lat],
-          },
-        },
-      });
-    });
-  }
 }

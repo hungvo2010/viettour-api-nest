@@ -4,7 +4,7 @@ import { IsNumber, IsOptional, IsEnum } from 'class-validator';
 
 export class GetTourDto {
   @IsOptional()
-  cursorValue: any;
+  cursor: any;
 
   @IsNumber()
   @Type(() => Number)

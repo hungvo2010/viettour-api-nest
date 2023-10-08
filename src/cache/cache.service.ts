@@ -16,6 +16,14 @@ export class CacheService {
     await this.cacheManager.del(Constant.CACHE_KEY_CREATOR + userId);
   }
 
+  async getItemFromCache(keyPrefix: string, key: string) {
+    await this.cacheManager.get(keyPrefix + key);
+  }
+
+  async addItemToCache(keyPrefix: string, key: string, value) {
+    await this.cacheManager.set(keyPrefix + key, value);
+  }
+
   async deleteCache(key: string) {
     this.logger.log(`deleteCache: ${key}`);
     await this.cacheManager.del(key);

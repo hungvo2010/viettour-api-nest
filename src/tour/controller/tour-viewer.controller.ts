@@ -82,14 +82,14 @@ export class TourViewerController {
     @Param('id') tourId: string,
   ) {
     this.logger.log('Like tour: ' + tourId);
-    await this.tourService.likeTour(tourId, likeTourDto);
+    await this.tourService.likeTour(tourId, likeTourDto.liked);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post(':id')
   async deleteTour(@Param('id') tourId: string, @Req() req) {
     this.logger.log('Delete tour: ' + tourId);
-    await this.tourService.deleteTour(tourId, req.user);
+    await this.tourService.deleteTour(tourId, req.user.id);
     return {
       message: 'Deleted tour successfully',
       timestamp: new Date().toISOString(),
