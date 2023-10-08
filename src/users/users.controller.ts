@@ -20,11 +20,9 @@ export class UsersController {
   @Get('/')
   @UseGuards(JwtAuthGuard)
   async getProfile(@Request() req) {
-    this.logger.log('user: ' + JSON.stringify(req.user));
-    const user = await this.usersService.getProfile(req.user);
-    const { password, ...profile } = user;
+    const user = await this.usersService.getProfile(req.user.id);
     return {
-      item: profile,
+      item: user,
       timestamp: new Date().toISOString(),
     };
   }
@@ -32,9 +30,8 @@ export class UsersController {
   @Get(':userId')
   async getUser(@Param('userId') userId: string) {
     const user = await this.usersService.findByUserId(userId);
-    const { password, ...returnData } = user;
     return {
-      item: returnData,
+      item: user,
       timestamp: new Date().toISOString(),
     };
   }
@@ -58,7 +55,8 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @Request() req,
   ) {
-    await this.usersService.updateUser(userId, req.user.userId, updateUserDto);
+    await this.usersService.checkUserPermission(req.user.userId, userId);
+    await this.usersService.updateUser(userId, updateUserDto);
     return {
       message: 'Update user successfully',
       timestamp: new Date().toISOString(),

@@ -1,23 +1,16 @@
 import { TourService } from './../tour/tour.service';
-import {
-  Injectable,
-  Logger,
-  ForbiddenException,
-  CACHE_MANAGER,
-  Inject,
-} from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma, User, PrivacyStatus, EditStatus } from '@prisma/client';
+import { Prisma, PrivacyStatus, EditStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { excludeField } from 'src/common/utils';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private prismaService: PrismaService,
     private tourService: TourService,
   ) {}
@@ -31,27 +24,16 @@ export class UsersService {
     });
   }
 
-  async getProfile(user: any) {
-    this.logger.log('user: ' + JSON.stringify(user));
-
-    return this.findByUserId(user.userId);
+  async getProfile(userId: any) {
+    return this.findByUserId(userId);
   }
 
-  async updateUser(
-    needUpdateUserId: string,
-    initReqUserId: string,
-    { email, password, ...updateUserDto }: UpdateUserDto,
-  ) {
-    this.logger.log(
-      'needUpdateUserId: ' + needUpdateUserId,
-      'initReqUserId: ' + initReqUserId,
-    );
-    await this.checkUserPermission(initReqUserId, needUpdateUserId);
+  async updateUser(userId: string, updateData: UpdateUserDto) {
     await this.prismaService.user.update({
       where: {
-        id: needUpdateUserId,
+        id: userId,
       },
-      data: updateUserDto,
+      data: updateData,
     });
   }
 
@@ -88,13 +70,13 @@ export class UsersService {
     });
   }
 
-  async findByUserId(userId: string): Promise<User | undefined> {
+  async findByUserId(userId: string) {
     const user = await this.prismaService.user.findUnique({
       where: {
         id: userId,
       },
     });
-    return user;
+    return excludeField(user, ['password']);
   }
 
   async getUserTours(userId: string, initReqUserId: string): Promise<any[]> {
