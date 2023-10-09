@@ -31,7 +31,7 @@ export class CacheService {
   }
 
   @Cron(Constant.EVERY_2_MINUTES, { name: 'CronUpdateViewCount' })
-  async handleCron() {
+  async handleCronUpdateView() {
     const keys = await this.cacheManager.store.keys();
     for (const key of keys) {
       if (key.startsWith(Constant.CACHE_KEY_TOURVIEW)) {
@@ -50,7 +50,7 @@ export class CacheService {
             },
           },
         });
-        // await this.cacheManager.set(key, 0);
+        await this.cacheManager.set(key, 0);
       }
     }
   }

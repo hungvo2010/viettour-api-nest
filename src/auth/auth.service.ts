@@ -40,7 +40,9 @@ export class AuthService {
   ) {
     const user = await this.usersService.findByEmail(email);
     const isMatch = await bcrypt.compare(currentPassword, user.password);
+
     if (!isMatch) throw new UnauthorizedException('Current password is wrong');
+
     const hashedPassword = await bcrypt.hash(newPassword, Constant.SALT_ROUNDS);
     await this.prismaService.user.update({
       where: {
@@ -64,12 +66,14 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
+
     if (!user)
       throw new UnauthorizedException('Your email or password is wrong');
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
       return user;
     }
+
     throw new UnauthorizedException('Your email or password is wrong');
   }
 
@@ -86,12 +90,11 @@ export class AuthService {
       registerDto.password,
       Constant.SALT_ROUNDS,
     );
-    const data: CreateUserDto = {
+    return {
       email: registerDto.email,
       fullname: registerDto.fullname,
       password: hashedPassword,
     };
-    return data;
   }
 
   async getGoogleUserProfile(idToken: string): Promise<any> {
