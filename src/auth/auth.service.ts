@@ -3,19 +3,18 @@ import {
   Injectable,
   Logger,
   UnauthorizedException,
-} from "@nestjs/common";
-import * as bcrypt from "bcrypt";
-import * as firebaseAdmin from "firebase-admin";
-import { JwtService } from "@nestjs/jwt";
+} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import * as firebaseAdmin from 'firebase-admin';
+import { JwtService } from '@nestjs/jwt';
 
-import { RegisterAuthDto } from "./dto/register-auth.dto";
-import { UsersService } from "src/users/users.service";
-import { User } from "@prisma/client";
-import { PrismaService } from "src/prisma.service";
-import { CreateUserDto } from "src/users/dto/create-user.dto";
-import { Constant } from "src/common/constant";
-import { ChangePasswordDto } from "./dto/change-password.dto";
-import { ACCOUNT_ALREADY_EXIST, CURRENT_PASSWORD_WRONG, WRONG_CREDENTIALS } from "./auth.service";
+import { RegisterAuthDto } from './dto/register-auth.dto';
+import { UsersService } from 'src/users/users.service';
+import { User } from '@prisma/client';
+import { PrismaService } from 'src/prisma.service';
+import { Constant } from 'src/common/constant';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import ResponseMessage from './auth.constant';
 
 @Injectable()
 export class AuthService {
@@ -23,12 +22,13 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private prismaService: PrismaService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async register(registerDto: RegisterAuthDto) {
     const existUser = await this.usersService.findByEmail(registerDto.email);
-    if (existUser) throw new ConflictException(ACCOUNT_ALREADY_EXIST);
+    if (existUser)
+      throw new ConflictException(ResponseMessage.ACCOUNT_ALREADY_EXIST);
     const data = await this.prepareCreateUserDto(registerDto);
     const user = await this.usersService.create(data);
     return user;
@@ -36,12 +36,13 @@ export class AuthService {
 
   async changePassword(
     { email, userId },
-    { currentPassword, newPassword }: ChangePasswordDto
+    { currentPassword, newPassword }: ChangePasswordDto,
   ) {
     const user = await this.usersService.findByEmail(email);
     const isMatch = await bcrypt.compare(currentPassword, user.password);
 
-    if (!isMatch) throw new UnauthorizedException(CURRENT_PASSWORD_WRONG);
+    if (!isMatch)
+      throw new UnauthorizedException(ResponseMessage.CURRENT_PASSWORD_WRONG);
 
     const hashedPassword = await bcrypt.hash(newPassword, Constant.SALT_ROUNDS);
     await this.prismaService.user.update({
@@ -68,13 +69,13 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
 
     if (!user)
-      throw new UnauthorizedException(WRONG_CREDENTIALS);
+      throw new UnauthorizedException(ResponseMessage.WRONG_CREDENTIALS);
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
       return user;
     }
 
-    throw new UnauthorizedException(WRONG_CREDENTIALS);
+    throw new UnauthorizedException(ResponseMessage.WRONG_CREDENTIALS);
   }
 
   async generateToken(user: User) {
@@ -88,7 +89,7 @@ export class AuthService {
   async prepareCreateUserDto(registerDto: RegisterAuthDto) {
     const hashedPassword = await bcrypt.hash(
       registerDto.password,
-      Constant.SALT_ROUNDS
+      Constant.SALT_ROUNDS,
     );
     return {
       email: registerDto.email,
@@ -103,10 +104,10 @@ export class AuthService {
       const userId = decodedToken.uid;
       const userRecord = await firebaseAdmin.auth().getUser(userId);
       const { displayName, email, photoURL } = userRecord;
-      this.logger.log("Login with Google: email = " + email);
+      this.logger.log('Login with Google: email = ' + email);
       return { fullname: displayName, email, avatarUrl: photoURL };
     } catch (error) {
-      console.error("Error retrieving user profile:", error);
+      console.error('Error retrieving user profile:', error);
       throw error;
     }
   }
@@ -117,10 +118,10 @@ export class AuthService {
       const userId = decodedToken.uid;
       const userRecord = await firebaseAdmin.auth().getUser(userId);
       const { displayName, email, photoURL } = userRecord;
-      this.logger.log("Login with Google: email = " + email);
+      this.logger.log('Login with Google: email = ' + email);
       return { fullname: displayName, email, avatarUrl: photoURL };
     } catch (error) {
-      console.error("Error retrieving user profile:", error);
+      console.error('Error retrieving user profile:', error);
       throw error;
     }
   }

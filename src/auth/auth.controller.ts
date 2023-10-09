@@ -21,6 +21,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { IdTokenDto } from './dto/IdToken.dto';
 import { excludeField } from 'src/common/utils';
+import ResponseMessage from './auth.constant';
 
 @Controller('/v1.0/auth')
 export class AuthController {
@@ -47,7 +48,7 @@ export class AuthController {
   ) {
     if (registerDto.password !== registerDto.confirmPassword) {
       throw new BadRequestException(
-        'Password and confirm password are not the same',
+        ResponseMessage.CONFIRM_PASSWORD_DOES_NOT_WORK,
       );
     }
     const user = await this.authService.register(registerDto);
@@ -111,13 +112,13 @@ export class AuthController {
   ) {
     if (changePasswordDto.newPassword !== changePasswordDto.confirmPassword) {
       throw new BadRequestException(
-        'Password and confirm password are not the same',
+        ResponseMessage.CONFIRM_PASSWORD_DOES_NOT_WORK,
       );
     }
     await this.authService.changePassword(req.user, changePasswordDto);
     return {
       item: {},
-      message: 'Password changed successfully',
+      message: ResponseMessage.PASSWORD_CHANGE_SUCCESS,
       timestamp: new Date().toISOString(),
     };
   }
