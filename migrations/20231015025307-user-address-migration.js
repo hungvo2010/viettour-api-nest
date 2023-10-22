@@ -1,7 +1,6 @@
 module.exports = {
   async up(db, client) {
-    await db.collection('User').updateMany(
-      { address: { $exists: true } },
+    await db.collection('User').updateMany({ address: { $exists: true } }, [
       {
         $set: {
           addressName: '$address.name',
@@ -10,11 +9,11 @@ module.exports = {
             coordinates: ['$address.lng', '$address.lat'],
           },
         },
-        $unset: {
-          address: true,
-        },
       },
-    );
+      {
+        $unset: ['address'],
+      },
+    ]);
   },
 
   async down(db, client) {
