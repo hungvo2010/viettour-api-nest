@@ -15,7 +15,6 @@ model User {
   email        String       @unique
   password     String
   fullname     String
-  address      Address?
   addressName  String?
   location     Location?
   description  String       @default("We don't know much about you, but we're sure you are great and the profile will be completed soon.")
