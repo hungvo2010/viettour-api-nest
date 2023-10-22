@@ -29,7 +29,6 @@ model User {
 model Tour {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  address     Address?
   addressName String?
   location    Location?
   description String        @default("")
