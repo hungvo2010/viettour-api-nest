@@ -47,7 +47,7 @@ Any additional information goes here
 
 ## Authors
 
-- [@octokatherine](https://www.github.com/octokatherine)
+- [@hungvo2010](https://www.github.com/hungvo2010)
 
 
 ## Badges
@@ -78,8 +78,7 @@ Please adhere to this project's `code of conduct`.
 
 
 ## Demo
-
-Insert gif or link to demo
+[Link](https://drive.google.com/file/d/1_N9IDycqos7gakuwTrzLUVpQh9b0XKqw/view?usp=sharing)
 
 
 ## Deployment
@@ -103,6 +102,7 @@ To run this project, you will need to add the following environment variables to
 `API_KEY`
 
 `ANOTHER_API_KEY`
+
 
 
 ## FAQ
@@ -197,9 +197,9 @@ For support, email fake@fake.com or join our Slack channel.
 
 ## Tech Stack
 
-**Client:** React, Redux, TailwindCSS
+**Client:** React, Redux, Antd, Bootstrap
 
-**Server:** Node, Express
+**Server:** NestJS
 
 
 ## Running Tests
