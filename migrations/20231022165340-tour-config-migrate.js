@@ -18,21 +18,6 @@ module.exports = {
           },
         },
       },
-      // {
-      //   $unset: {
-      //     textColor: 1,
-      //     soundOption: 1,
-      //     enableAutoRotate: 1,
-      //     autoRotateSpeed: 1,
-      //     autoHideInfospot: 1,
-      //     autoHideShareButton: 1,
-      //     lockHorizontalView: 1,
-      //     privacyStatus: 1,
-      //     editStatus: 1,
-      //     isPasswordProtected: 1,
-      //     password: 1,
-      //   },
-      // },
     ]);
   },
 
