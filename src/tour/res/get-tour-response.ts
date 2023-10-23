@@ -1,6 +1,5 @@
 export const GET_TOUR_RESPONSE = {
   id: true,
-  address: true,
   name: true,
   encodeUrl: true,
   config: {
@@ -11,14 +10,7 @@ export const GET_TOUR_RESPONSE = {
   category: true,
   description: true,
   socialImage: true,
-  creator: {
-    select: {
-      id: true,
-      fullname: true,
-      avatarUrl: true,
-      address: true,
-    },
-  },
+  creatorId: true,
   statistic: {
     select: {
       likeCount: true,

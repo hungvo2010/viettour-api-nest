@@ -1,4 +1,3 @@
-import { JwtAuthGuard } from './../../guards/jwt-auth.guard';
 import {
   Controller,
   Get,
@@ -10,38 +9,38 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from './../../guards/jwt-auth.guard';
 import { TourService } from '../tour.service';
 import { GetTourDto } from '../dto/get-tour.dto';
 import { LikeTourDto } from '../dto/like-tour.dto';
 import { FindAddressDto } from '../dto/find-address.dto';
 
-@Controller('/v1.0/tours/')
+@Controller('/v1.0/tours')
 export class TourViewerController {
   constructor(private readonly tourService: TourService) {}
   private readonly logger = new Logger(TourViewerController.name);
 
-  @Get('all')
+  @Get('')
   async getAllTours(@Query() queryDto: GetTourDto) {
     this.logger.log(`getAllTours: ${JSON.stringify(queryDto)}`);
     const [total, tours] = await this.tourService.getAllTours(queryDto);
     return {
       total,
       values: tours,
-      timestamp: new Date().toISOString(),
+      next: tours[tours.length - 1]?.id,
     };
   }
 
-  @Get('search')
+  @Get('/search')
   async getTourByFilter(@Query('query') query: string) {
     this.logger.log(`getTourByFilter: ${query}`);
     const tours = await this.tourService.getToursWithFilter(query);
     return {
       values: tours,
-      timestamp: new Date().toISOString(),
     };
   }
 
-  @Get('address')
+  @Get('/address')
   async findToursByAddress(@Query() queryDto: FindAddressDto) {
     this.logger.log(
       `findToursByAddress: lat: ${queryDto.lat}, lng: ${queryDto.lng}`,
@@ -52,7 +51,6 @@ export class TourViewerController {
     );
     return {
       values: tours,
-      timestamp: new Date().toISOString(),
     };
   }
 
@@ -62,7 +60,6 @@ export class TourViewerController {
     const vrTour = await this.tourService.findOne(tourId);
     return {
       item: vrTour,
-      timestamp: new Date().toISOString(),
     };
   }
 
@@ -72,7 +69,6 @@ export class TourViewerController {
     const vrTour = await this.tourService.findByEncodeUrl(encodeUrl);
     return {
       item: vrTour,
-      timestamp: new Date().toISOString(),
     };
   }
 
@@ -92,7 +88,6 @@ export class TourViewerController {
     await this.tourService.deleteTour(tourId, req.user.id);
     return {
       message: 'Deleted tour successfully',
-      timestamp: new Date().toISOString(),
     };
   }
 }

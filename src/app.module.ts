@@ -12,6 +12,8 @@ import { redisStore } from 'cache-manager-redis-store';
 // import { GraphQLModule } from '@nestjs/graphql';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheInvalidateModule } from './cache/cache.invalidate.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TimestampInterceptor } from './interceptors/timestamp.interceptor';
 
 @Module({
   imports: [
@@ -55,6 +57,10 @@ import { CacheInvalidateModule } from './cache/cache.invalidate.module';
     //   provide: 'PUB_SUB',
     //   useValue: new PubSub(),
     // },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TimestampInterceptor,
+    },
   ],
 })
 export class AppModule {}

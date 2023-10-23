@@ -23,7 +23,6 @@ export class UsersController {
     const user = await this.usersService.getProfile(req.user.id);
     return {
       item: user,
-      timestamp: new Date().toISOString(),
     };
   }
 
@@ -32,7 +31,6 @@ export class UsersController {
     const user = await this.usersService.findByUserId(userId);
     return {
       item: user,
-      timestamp: new Date().toISOString(),
     };
   }
 
@@ -44,7 +42,6 @@ export class UsersController {
     );
     return {
       values: tours,
-      timestamp: new Date().toISOString(),
     };
   }
 
@@ -59,7 +56,6 @@ export class UsersController {
     await this.usersService.updateUser(userId, updateUserDto);
     return {
       message: 'Update user successfully',
-      timestamp: new Date().toISOString(),
     };
   }
 }

@@ -4,4 +4,8 @@ function excludeField(object, fields) {
   );
 }
 
-export { excludeField };
+function buildHateoasUrl(basePath: string, cursor: string): string {
+  return `${basePath}?cursor=${cursor}`;
+}
+
+export { excludeField, buildHateoasUrl };

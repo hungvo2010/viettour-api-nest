@@ -37,7 +37,6 @@ export class AuthController {
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
     return {
       item: req.user,
-      timestamp: new Date().toISOString(),
     };
   }
 
@@ -59,7 +58,6 @@ export class AuthController {
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
     return {
       item: excludeField(user, ['password']),
-      timestamp: new Date().toISOString(),
     };
   }
 
@@ -82,7 +80,6 @@ export class AuthController {
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
     return {
       item: newUser,
-      timestamp: new Date().toISOString(),
     };
   }
 
@@ -99,7 +96,6 @@ export class AuthController {
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
     return {
       item: excludeField(newUser, ['password']),
-      timestamp: new Date().toISOString(),
     };
   }
 
@@ -119,7 +115,6 @@ export class AuthController {
     return {
       item: {},
       message: ResponseMessage.PASSWORD_CHANGE_SUCCESS,
-      timestamp: new Date().toISOString(),
     };
   }
 

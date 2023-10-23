@@ -11,7 +11,7 @@ export class CacheController {
     await this.cacheService.deleteCache(cacheKey);
     return {
       message: 'Deleted cache successfully',
-      timestamp: new Date().toISOString(),
+      
     };
   }
 }
