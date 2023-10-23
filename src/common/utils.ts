@@ -4,8 +4,8 @@ function excludeField(object, fields) {
   );
 }
 
-function buildHateoasUrl(basePath: string, cursor: string): string {
-  return `${basePath}?cursor=${cursor}`;
+function buildHateoasUrl(basePath: string, queryParams): string {
+  return `${basePath}?` + new URLSearchParams(queryParams).toString();
 }
 
 export { excludeField, buildHateoasUrl };

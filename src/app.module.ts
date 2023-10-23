@@ -1,4 +1,3 @@
-import { PrismaService } from './prisma.service';
 import { Constant } from 'src/common/constant';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -9,7 +8,6 @@ import { TourModule } from './tour/tour.module';
 import { AuthModule } from './auth/auth.module';
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
-// import { GraphQLModule } from '@nestjs/graphql';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheInvalidateModule } from './cache/cache.invalidate.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -40,23 +38,10 @@ import { TimestampInterceptor } from './interceptors/timestamp.interceptor';
         ttl: Constant.REDIS_TTL,
       }),
     }),
-    // GraphQLModule.forRoot({
-    //   playground: true,
-    //   typePaths: ['./**/*.graphql'],
-    //   driver: ApolloDriver,
-    //   installSubscriptionHandlers: true,
-    // }),
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    // SubscribeService,
-    // PingPongResolvers,
-    // CacheInvalidationResolvers,
-    // {
-    //   provide: 'PUB_SUB',
-    //   useValue: new PubSub(),
-    // },
     {
       provide: APP_INTERCEPTOR,
       useClass: TimestampInterceptor,

@@ -8,17 +8,17 @@ import {
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
-import { GetTourDto } from './dto/get-tour.dto';
 import {
   GET_TOUR_BY_CREATOR_RESPONSE,
   GET_TOUR_RESPONSE,
 } from './res/get-tour-response';
+import { FIND_ONE_CONFIG_CONDITION } from './tour.constant';
+import { GetTourDto } from './dto/get-tour.dto';
 import { Tour, PrivacyStatus, EditStatus, TourCategory } from '@prisma/client';
 import { Constant } from 'src/common/constant';
 import { PrismaService } from 'src/prisma.service';
 import { NativeMongoService } from './controller/native.mongo.service';
 import { CacheService } from 'src/cache/cache.service';
-import { FIND_ONE_CONFIG_CONDITION } from './tour.constant';
 
 @Injectable()
 export class TourService {
@@ -215,37 +215,4 @@ export class TourService {
       url,
     )) as string;
   }
-
-  // async batchUpdateAddress() {
-  //   // todo: write batch update using PrismaService to update tour.address to addressName and location properties in schema.prisma
-  //   const tours = await this.prismaService.tour.findMany({
-  //     where: {
-  //       NOT: {
-  //         OR: [
-  //           {
-  //             address: undefined,
-  //           },
-  //           {
-  //             address: null,
-  //           },
-  //         ],
-  //       },
-  //     },
-  //   });
-  //   this.logger.log('tours: ' + JSON.stringify(tours));
-  //   tours.forEach(async (tour) => {
-  //     await this.prismaService.tour.update({
-  //       where: {
-  //         id: tour.id,
-  //       },
-  //       data: {
-  //         addressName: tour.address.name,
-  //         location: {
-  //           type: 'Point',
-  //           coordinates: [tour.address.lng, tour.address.lat],
-  //         },
-  //       },
-  //     });
-  //   });
-  // }
 }
