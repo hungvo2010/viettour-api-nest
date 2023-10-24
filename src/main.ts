@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma.service';
-import { HttpExceptionFilter } from './filter/http-exception.filter';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
 import {
   BadRequestException,
   INestApplication,
@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import * as compression from 'compression';
-import { CommonExceptionFilter } from './filter/common-exception.filter';
+import { CommonExceptionFilter } from './filters/common-exception.filter';
 import { configFirebaseAdmin } from './firebase.config';
 
 declare const module: any;
