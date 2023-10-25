@@ -42,15 +42,18 @@ function configureApp(app: INestApplication) {
       whitelist: true,
       transform: true,
       enableDebugMessages: true,
-      exceptionFactory: (errors) => {
-        const errorMessages = {};
-        errors.forEach((error) => {
-          errorMessages[error.property] = Object.values(error.constraints)
-            .join('. ')
-            .trim();
-        });
-        return new BadRequestException(errorMessages);
-      },
+      dismissDefaultMessages: true,
+      // exceptionFactory: (errors) => {
+      //   const errorMessages = {};
+      //   console.log(errors);
+      //   errors.forEach((error) => {
+      //     errorMessages[error.property] = Object.values(error.constraints)
+      //       .join('. ')
+      //       .trim();
+      //   });
+      //   // console.log(errorMessages);
+      //   return new BadRequestException(errorMessages);
+      // },
     }),
   );
   app.enableCors({
