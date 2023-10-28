@@ -16,7 +16,7 @@ export function IsHexadecimalString(validationOptions?: ValidationOptions) {
           if (typeof value !== 'string') {
             return false;
           }
-          const hexPattern = /^0x[0-9a-fA-F]*$/;
+          const hexPattern = /^[a-fA-F0-9]+$/;
           return hexPattern.test(value);
         },
         defaultMessage(args: ValidationArguments) {
