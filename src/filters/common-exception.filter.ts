@@ -11,7 +11,7 @@ import { Request, Response } from 'express';
 export class CommonExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(CommonExceptionFilter.name);
   catch(exception: any, host: ArgumentsHost) {
-    this.logger.error(exception.message);
+    this.logger.error(exception);
 
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -21,7 +21,6 @@ export class CommonExceptionFilter implements ExceptionFilter {
     response.status(status).json({
       message: exception.message,
       statusCode: status,
-      
       path: request.url,
     });
   }

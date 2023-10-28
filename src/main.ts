@@ -1,4 +1,3 @@
-import { TourService } from 'src/tour/tour.service';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -30,9 +29,6 @@ async function bootstrap() {
 
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
-
-  // const tourService = app.get(TourService);
-  // await tourService.batchUpdateAddress();
 }
 
 function configureApp(app: INestApplication) {
@@ -42,18 +38,11 @@ function configureApp(app: INestApplication) {
       whitelist: true,
       transform: true,
       enableDebugMessages: true,
-      dismissDefaultMessages: true,
-      // exceptionFactory: (errors) => {
-      //   const errorMessages = {};
-      //   console.log(errors);
-      //   errors.forEach((error) => {
-      //     errorMessages[error.property] = Object.values(error.constraints)
-      //       .join('. ')
-      //       .trim();
-      //   });
-      //   // console.log(errorMessages);
-      //   return new BadRequestException(errorMessages);
-      // },
+      // dismissDefaultMessages: true,
+      exceptionFactory: (errors) => {
+        const errorMessages = Object.values(errors[0]?.constraints)[0];
+        return new BadRequestException(errorMessages);
+      },
     }),
   );
   app.enableCors({
