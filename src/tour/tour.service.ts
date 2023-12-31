@@ -185,8 +185,7 @@ export class TourService {
   buildCursorParams(size: number, cursor: string) {
     return {
       take: size,
-      ...(cursor && { cursor: { id: cursor } }),
-      skip: 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
     };
   }
 

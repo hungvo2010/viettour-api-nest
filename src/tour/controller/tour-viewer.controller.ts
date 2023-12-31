@@ -28,6 +28,7 @@ export class TourViewerController {
     const [total, tours] = await this.tourService.getAllTours(queryDto);
     return {
       total,
+      length: tours.length,
       values: tours,
       next: buildHateoasUrl(req.path, {
         ...queryDto,
