@@ -20,7 +20,7 @@ export class UsersController {
   @Get('/')
   @UseGuards(JwtAuthGuard)
   async getProfile(@Request() req) {
-    const user = await this.usersService.getProfile(req.user.id);
+    const user = await this.usersService.getProfile(req.user.userId);
     return {
       item: user,
     };
