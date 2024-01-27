@@ -1,17 +1,17 @@
-import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { PrismaService } from './prisma.service';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
 import {
   BadRequestException,
   INestApplication,
   ValidationPipe,
 } from '@nestjs/common';
-import * as cookieParser from 'cookie-parser';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
 import * as compression from 'compression';
+import * as cookieParser from 'cookie-parser';
+import { AppModule } from './app.module';
 import { CommonExceptionFilter } from './filters/common-exception.filter';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { configFirebaseAdmin } from './firebase.config';
+import { PrismaService } from './prisma.service';
 
 declare const module: any;
 
@@ -46,7 +46,7 @@ function configureApp(app: INestApplication) {
     }),
   );
   app.enableCors({
-    origin: process.env.ALLOWED_CROSS_ORIGIN.split(', '),
+    origin: true,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
