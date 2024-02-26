@@ -9,7 +9,7 @@ export class TimestampInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         return {
-          ...data,
+          ...data as object,
           timestamp: new Date().toISOString(),
         };
       }),
