@@ -80,7 +80,7 @@ export class UsersService {
   }
 
   async getUserTours(userId: string, initReqUserId: string): Promise<any[]> {
-    this.logger.log('initGetUserTours: ' + initReqUserId);
+    this.logger.log('init userID: ' + initReqUserId);
     let tours = await this.tourService.findByCreator(userId);
     if (initReqUserId !== userId) {
       tours = tours.filter((tour) => {

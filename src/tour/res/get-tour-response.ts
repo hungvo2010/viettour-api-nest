@@ -23,7 +23,6 @@ export const GET_TOUR_RESPONSE = {
 export const GET_TOUR_BY_CREATOR_RESPONSE = {
   id: true,
   name: true,
-  address: true,
   addressName: true,
   location: true,
   description: true,
@@ -32,9 +31,7 @@ export const GET_TOUR_BY_CREATOR_RESPONSE = {
   createdAt: true,
   modifiedAt: true,
   encodeUrl: true,
-  likeCount: true,
-  viewCount: true,
+  statistic: true,
   creator: true,
-  privacyStatus: true,
-  editStatus: true,
+  config: true,
 };

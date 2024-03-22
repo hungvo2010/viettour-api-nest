@@ -35,11 +35,10 @@ export class UsersController {
   }
 
   @Get(':userId/tours')
+  @UseGuards(JwtAuthGuard)
   async getUserTours(@Param('userId') userId: string, @Request() req) {
-    const tours = await this.usersService.getUserTours(
-      userId,
-      req.user?.userId,
-    );
+    this.logger.log(req.user);
+    const tours = await this.usersService.getUserTours(userId, req?.user?.userId);
     return {
       values: tours,
     };
