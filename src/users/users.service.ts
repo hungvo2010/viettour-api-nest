@@ -1,10 +1,10 @@
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { EditStatus, Prisma, PrivacyStatus } from '@prisma/client';
+import { excludeField } from 'src/common/utils';
+import { PrismaService } from 'src/prisma.service';
 import { TourService } from './../tour/tour.service';
-import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma, PrivacyStatus, EditStatus } from '@prisma/client';
-import { PrismaService } from 'src/prisma.service';
-import { excludeField } from 'src/common/utils';
 
 @Injectable()
 export class UsersService {
@@ -80,7 +80,7 @@ export class UsersService {
   }
 
   async getUserTours(userId: string, initReqUserId: string): Promise<any[]> {
-    this.logger.log('init userID: ' + initReqUserId);
+    this.logger.log('get UserTours init userID: ' + initReqUserId);
     let tours = await this.tourService.findByCreator(userId);
     if (initReqUserId !== userId) {
       tours = tours.filter((tour) => {

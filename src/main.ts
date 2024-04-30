@@ -38,7 +38,6 @@ function configureApp(app: INestApplication) {
       whitelist: true,
       transform: true,
       enableDebugMessages: true,
-      // dismissDefaultMessages: true,
       exceptionFactory: (errors) => {
         const errorMessages = Object.values(errors[0]?.constraints)[0];
         return new BadRequestException(errorMessages);

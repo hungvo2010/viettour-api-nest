@@ -4,17 +4,17 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as firebaseAdmin from 'firebase-admin';
-import { JwtService } from '@nestjs/jwt';
 
-import { RegisterAuthDto } from './dto/register-auth.dto';
-import { UsersService } from 'src/users/users.service';
 import { User } from '@prisma/client';
-import { PrismaService } from 'src/prisma.service';
 import { Constant } from 'src/common/constant';
-import { ChangePasswordDto } from './dto/change-password.dto';
+import { PrismaService } from 'src/prisma.service';
+import { UsersService } from 'src/users/users.service';
 import ResponseMessage from './auth.constant';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { RegisterAuthDto } from './dto/register-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -103,6 +103,7 @@ export class AuthService {
       const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
       const userId = decodedToken.uid;
       const userRecord = await firebaseAdmin.auth().getUser(userId);
+      this.logger.log('User profile : ' + JSON.stringify(userRecord));
       const { displayName, email, photoURL } = userRecord;
       this.logger.log('Login with Google: email = ' + email);
       return { fullname: displayName, email, avatarUrl: photoURL };

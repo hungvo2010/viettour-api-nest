@@ -1,27 +1,27 @@
-import { GoogleAuthGuard } from '../guards/google-auth.guard';
 import {
-  Controller,
-  Post,
-  UseGuards,
-  Request,
+  BadRequestException,
   Body,
-  Res,
+  Controller,
+  Get,
+  HttpCode,
   HttpStatus,
   Logger,
-  HttpCode,
-  Get,
-  BadRequestException,
+  Post,
+  Request,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LocalAuthGuard } from '../guards/local-auth.guard';
-import { RegisterAuthDto } from './dto/register-auth.dto';
 import { Response } from 'express';
 import { Constant } from 'src/common/constant';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { IdTokenDto } from './dto/IdToken.dto';
 import { excludeField } from 'src/common/utils';
+import { GoogleAuthGuard } from '../guards/google-auth.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { LocalAuthGuard } from '../guards/local-auth.guard';
 import ResponseMessage from './auth.constant';
+import { AuthService } from './auth.service';
+import { IdTokenDto } from './dto/IdToken.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { RegisterAuthDto } from './dto/register-auth.dto';
 
 @Controller('/v1.0/auth')
 export class AuthController {
