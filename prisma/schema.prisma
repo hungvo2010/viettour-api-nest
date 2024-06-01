@@ -15,6 +15,7 @@ model User {
   email        String       @unique
   password     String
   fullname     String
+  address      Address?
   addressName  String?
   location     Location?
   description  String       @default("We don't know much about you, but we're sure you are great and the profile will be completed soon.")
@@ -28,15 +29,17 @@ model User {
 
 model Tour {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  tourId      String        @unique
   name        String
+  address     Address?
   addressName String?
   location    Location?
   description String        @default("")
   socialImage String        @default("")
   category    TourCategory  @default(NOT_SET)
   encodeUrl   String?       @unique
-  config      TourConfig
-  statistic   TourStatistic
+  config      TourConfig?
+  statistic   TourStatistic?
   createdAt   DateTime      @default(now())
   modifiedAt  DateTime      @default(now())
   floorPlan   FloorPlan?
@@ -96,7 +99,7 @@ model Scene {
   is2D             Boolean     @default(false)
   thumbnailUrl     String?
   hotspotUrl       String?
-  config           SceneConfig
+  config           SceneConfig?
   dateUploaded     DateTime    @default(now())
   dateModified     DateTime    @default(now())
   dimensions       Dimension?

@@ -7,6 +7,7 @@ export const GET_TOUR_RESPONSE = {
       privacyStatus: true,
     },
   },
+  tourId: true,
   category: true,
   description: true,
   socialImage: true,
