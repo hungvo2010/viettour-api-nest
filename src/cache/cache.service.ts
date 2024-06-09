@@ -35,18 +35,14 @@ export class CacheService {
     const keys = await this.cacheManager.store.keys();
     for (const key of keys) {
       if (key.startsWith(Constant.CACHE_KEY_TOURVIEW)) {
-        const viewCount = await this.cacheManager.get(key);
+        const viewCount: number = await this.cacheManager.get(key);
         await this.prismaService.tour.update({
           where: {
             id: key.replace(Constant.CACHE_KEY_TOURVIEW, ''),
           },
           data: {
             statistic: {
-              update: {
-                viewCount: {
-                  increment: +viewCount,
-                },
-              },
+              viewCount,
             },
           },
         });
@@ -60,18 +56,14 @@ export class CacheService {
     const keys = await this.cacheManager.store.keys();
     for (const key of keys) {
       if (key.startsWith(Constant.CACHE_KEY_TOURLIKE)) {
-        const likeCount = await this.cacheManager.get(key);
+        const likeCount: number = await this.cacheManager.get(key);
         await this.prismaService.tour.update({
           where: {
             id: key.replace(Constant.CACHE_KEY_TOURLIKE, ''),
           },
           data: {
             statistic: {
-              update: {
-                likeCount: {
-                  increment: +likeCount,
-                },
-              },
+              likeCount: likeCount,
             },
           },
         });

@@ -1,21 +1,21 @@
 import {
+  Body,
   Controller,
   Get,
   Logger,
   Param,
   Post,
   Query,
-  Body,
   Req,
-  UseGuards,
   Request,
+  UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from './../../guards/jwt-auth.guard';
-import { TourService } from '../tour.service';
+import { buildHateoasUrl } from 'src/common/utils';
+import { FindAddressDto } from '../dto/find-address.dto';
 import { GetTourDto } from '../dto/get-tour.dto';
 import { LikeTourDto } from '../dto/like-tour.dto';
-import { FindAddressDto } from '../dto/find-address.dto';
-import { buildHateoasUrl } from 'src/common/utils';
+import { TourService } from '../tour.service';
+import { JwtAuthGuard } from './../../guards/jwt-auth.guard';
 
 @Controller('/v1.0/tours')
 export class TourViewerController {
@@ -64,15 +64,6 @@ export class TourViewerController {
   async getTour(@Param('id') tourId: string) {
     this.logger.log(`getTour: ${tourId}`);
     const vrTour = await this.tourService.findOne(tourId);
-    return {
-      item: vrTour,
-    };
-  }
-
-  @Get()
-  async getTourByEncodeUrl(@Query('encodeUrl') encodeUrl: string) {
-    this.logger.log('Get tour by encodeUrl: ' + encodeUrl);
-    const vrTour = await this.tourService.findByEncodeUrl(encodeUrl);
     return {
       item: vrTour,
     };

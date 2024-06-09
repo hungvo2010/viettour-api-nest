@@ -8,17 +8,17 @@ import {
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 
+import { EditStatus, PrivacyStatus, Tour, TourCategory } from '@prisma/client';
+import { CacheService } from 'src/cache/cache.service';
+import { Constant } from 'src/common/constant';
+import { PrismaService } from 'src/prisma.service';
+import { NativeMongoService } from './controller/native.mongo.service';
+import { GetTourDto } from './dto/get-tour.dto';
 import {
   GET_TOUR_BY_CREATOR_RESPONSE,
   GET_TOUR_RESPONSE,
 } from './res/get-tour-response';
 import { FIND_ONE_CONFIG_CONDITION } from './tour.constant';
-import { GetTourDto } from './dto/get-tour.dto';
-import { Tour, PrivacyStatus, EditStatus, TourCategory } from '@prisma/client';
-import { Constant } from 'src/common/constant';
-import { PrismaService } from 'src/prisma.service';
-import { NativeMongoService } from './controller/native.mongo.service';
-import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class TourService {
@@ -112,35 +112,6 @@ export class TourService {
       likeCount,
     );
     return likeCount;
-  }
-
-  async findByEncodeUrl(encodeUrl: string): Promise<Tour | undefined> {
-    const url = encodeURI(encodeUrl);
-    this.logger.log(`findByEncodeUrl: ${url}`);
-    let tour: Tour;
-    tour = (await this.cacheService.getItemFromCache(
-      Constant.CACHE_KEY_ENCODEURL,
-      url,
-    )) as Tour;
-    if (!tour) {
-      tour = await this.prismaService.tour.findUnique({
-        where: {
-          encodeUrl: url,
-        },
-      });
-      tour = tour.config.privacyStatus === PrivacyStatus.PUBLIC ? tour : null;
-      if (tour) {
-        await this.cacheService.addItemToCache(
-          Constant.CACHE_KEY_ENCODEURL,
-          url,
-          tour,
-        );
-      }
-    }
-    if (tour) {
-      tour.statistic.viewCount = await this.handleIncreaseViewCount(tour);
-    }
-    return tour;
   }
 
   async deleteTour(tourId: string, userId: string) {

@@ -37,7 +37,6 @@ model Tour {
   description String        @default("")
   socialImage String        @default("")
   category    TourCategory  @default(NOT_SET)
-  encodeUrl   String?       @unique
   config      TourConfig?
   statistic   TourStatistic?
   createdAt   DateTime      @default(now())
