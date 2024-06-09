@@ -59,7 +59,7 @@ export class TourService {
       this.logger.log('Tour cache missed: ', tourId);
       tour = await this.prismaService.tour.findFirst({
         where: {
-          id: tourId,
+          tourId,
           ...FIND_ONE_CONFIG_CONDITION,
         },
         include: {
