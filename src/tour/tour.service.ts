@@ -1,5 +1,4 @@
 import {
-  CACHE_MANAGER,
   ForbiddenException,
   Inject,
   Injectable,
@@ -19,6 +18,7 @@ import {
   GET_TOUR_RESPONSE,
 } from './res/get-tour-response';
 import { FIND_ONE_CONFIG_CONDITION } from './tour.constant';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class TourService {

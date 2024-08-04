@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
@@ -20,6 +21,10 @@ async function bootstrap() {
     logger: ['error', 'warn', 'debug', 'verbose', 'log'],
   });
   configureApp(app);
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.TCP,
+  });
+  await app.startAllMicroservices();
   await app.listen(parseInt(process.env.PORT) || 3000);
 
   if (module.hot) {
