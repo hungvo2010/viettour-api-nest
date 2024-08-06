@@ -1,18 +1,21 @@
+import { CacheModule, CacheStore } from '@nestjs/cache-manager';
+import { Global, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
+import { redisStore } from 'cache-manager-redis-store';
 import { Constant } from 'src/common/constant';
-import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UsersModule } from './users/users.module';
-import { TourModule } from './tour/tour.module';
 import { AuthModule } from './auth/auth.module';
-import { CacheModule, CacheStore } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-store';
-import { ScheduleModule } from '@nestjs/schedule';
 import { CacheInvalidateModule } from './cache/cache.invalidate.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TimestampInterceptor } from './interceptors/timestamp.interceptor';
+import { MetricsService } from './metrics/metric.service';
+import { LoggerMiddleware } from './middleware/LoggerMiddleware';
+import { TourModule } from './tour/tour.module';
+import { UsersModule } from './users/users.module';
 
+@Global()
 @Module({
   imports: [
     UsersModule,
@@ -40,7 +43,9 @@ import { TimestampInterceptor } from './interceptors/timestamp.interceptor';
     }),
   ],
   controllers: [AppController],
+  exports: [MetricsService],
   providers: [
+    MetricsService,
     AppService,
     {
       provide: APP_INTERCEPTOR,
@@ -48,4 +53,8 @@ import { TimestampInterceptor } from './interceptors/timestamp.interceptor';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

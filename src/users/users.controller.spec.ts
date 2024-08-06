@@ -4,7 +4,7 @@ import { UsersService } from './users.service';
 import { PrismaService } from 'src/prisma.service';
 import { CacheService } from 'src/cache/cache.service';
 import { TourService } from 'src/tour/tour.service';
-import { CACHE_MANAGER } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 describe('UsersController', () => {
   let controller: UsersController;

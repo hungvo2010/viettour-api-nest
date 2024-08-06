@@ -1,20 +1,24 @@
 import {
+  Body,
   Controller,
   Get,
-  Body,
-  Request,
-  Param,
-  UseGuards,
   Logger,
+  Param,
   Patch,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { MetricsService } from 'src/metrics/metric.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersService } from './users.service';
 
 @Controller('/v1.0/users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly metricsService: MetricsService,
+  ) {}
   private readonly logger = new Logger(UsersController.name);
 
   @Get('/')
@@ -28,6 +32,7 @@ export class UsersController {
 
   @Get(':userId')
   async getUser(@Param('userId') userId: string) {
+    this.metricsService.incrementRequestCounter();
     const user = await this.usersService.findByUserId(userId);
     return {
       item: user,
@@ -38,7 +43,10 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async getUserTours(@Param('userId') userId: string, @Request() req) {
     this.logger.log(req.user);
-    const tours = await this.usersService.getUserTours(userId, req?.user?.userId);
+    const tours = await this.usersService.getUserTours(
+      userId,
+      req?.user?.userId,
+    );
     return {
       values: tours,
     };
