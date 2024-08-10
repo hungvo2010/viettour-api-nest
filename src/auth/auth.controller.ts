@@ -14,6 +14,7 @@ import {
 import { Response } from 'express';
 import { Constant } from 'src/common/constant';
 import { excludeField } from 'src/common/utils';
+import { ResponseUtils } from 'src/common/utils/ResponseUtils';
 import { GoogleAuthGuard } from '../guards/google-auth.guard';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
@@ -35,9 +36,9 @@ export class AuthController {
     response
       .status(HttpStatus.OK)
       .cookie('jwt', jwtToken, Constant.COOKIE_OPTIONS);
-    return {
+    return ResponseUtils.response(0, 'Login successfully', {
       item: req.user,
-    };
+    });
   }
 
   @Post('/register')

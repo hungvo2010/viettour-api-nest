@@ -23,6 +23,9 @@ async function bootstrap() {
   configureApp(app);
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
+    options: {
+      port: 3001,
+    },
   });
   await app.startAllMicroservices();
   await app.listen(parseInt(process.env.PORT) || 3000);
