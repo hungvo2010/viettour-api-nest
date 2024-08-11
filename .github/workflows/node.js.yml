@@ -26,6 +26,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - run: echo "My API_KEY is ${{secrets.MONGODB_CONNECTION_STRING}}"
     - run: npm i -g mongodb && npx migrate-mongo up MONGODB_CONNECTION_STRING=${{ secrets.MONGODB_CONNECTION_STRING }}
     - run: npm ci
     - run: npm run build --if-present
