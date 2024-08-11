@@ -1,10 +1,9 @@
 import { ConsoleLogger } from '@nestjs/common';
-import { Request } from 'express';
-import { JwtPayload } from 'src/common/data/JwtPayload';
+import { RequestContext } from 'src/common/data/context/RequestContext';
 
 export class CustomLogger extends ConsoleLogger {
-  logInfo(payload: JwtPayload, request: Request, ...message: string[]): void {
-    super.log(this.basicLog(payload, request), message);
+  logInfo(context: RequestContext) {
+    this.log(this.basicLog(context));
   }
 
   error(message: string, trace: string): void {
@@ -23,11 +22,11 @@ export class CustomLogger extends ConsoleLogger {
     super.verbose(message);
   }
 
-  basicLog(payload: JwtPayload, request: Request) {
+  basicLog(context: RequestContext) {
     var logMessage = new Array<string>(
-      payload.userId,
-      payload.email,
-      'path: ' + request.originalUrl,
+      context.userId,
+      context.email,
+      'path: ' + context.originalRequest.originalUrl,
     );
     return logMessage.join('|');
   }

@@ -1,4 +1,4 @@
-import { Response } from '../data/Response';
+import { Response } from '../data/response/Response';
 export class ResponseUtils {
   public static ok<T>(data: T): Response<T> {
     return new Response(0, 'Success', data);

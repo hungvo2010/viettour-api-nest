@@ -9,6 +9,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CacheInvalidateModule } from './cache/cache.invalidate.module';
+import { RequestContext } from './common/data/context/RequestContext';
+import { HelloService } from './hello/HelloService';
 import { TimestampInterceptor } from './interceptors/timestamp.interceptor';
 import { MetricsService } from './metrics/metric.service';
 import { LoggerMiddleware } from './middleware/LoggerMiddleware';
@@ -46,6 +48,8 @@ import { UsersModule } from './users/users.module';
   exports: [MetricsService],
   providers: [
     MetricsService,
+    HelloService,
+    RequestContext,
     AppService,
     {
       provide: APP_INTERCEPTOR,
