@@ -40,7 +40,7 @@ async function bootstrap() {
 }
 
 function configureApp(app: INestApplication) {
-  app.useGlobalFilters(new HttpExceptionFilter(), new CommonExceptionFilter());
+  app.useGlobalFilters(new CommonExceptionFilter(), new HttpExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

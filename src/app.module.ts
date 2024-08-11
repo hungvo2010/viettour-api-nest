@@ -12,6 +12,7 @@ import { CacheInvalidateModule } from './cache/cache.invalidate.module';
 import { RequestContext } from './common/data/context/RequestContext';
 import { HelloService } from './hello/HelloService';
 import { TimestampInterceptor } from './interceptors/timestamp.interceptor';
+import { LoggerModule } from './logger/logger.module';
 import { MetricsService } from './metrics/metric.service';
 import { LoggerMiddleware } from './middleware/LoggerMiddleware';
 import { TourModule } from './tour/tour.module';
@@ -29,6 +30,7 @@ import { UsersModule } from './users/users.module';
     }),
     ScheduleModule.forRoot(),
     AuthModule,
+    LoggerModule,
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],
@@ -45,7 +47,7 @@ import { UsersModule } from './users/users.module';
     }),
   ],
   controllers: [AppController],
-  exports: [MetricsService],
+  exports: [MetricsService, RequestContext],
   providers: [
     MetricsService,
     HelloService,

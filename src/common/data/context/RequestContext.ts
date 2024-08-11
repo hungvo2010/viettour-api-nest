@@ -13,13 +13,16 @@ export class RequestContext {
   email: string;
   originalRequest: Request;
   constructor(@Inject(REQUEST) private request: Request) {
+    this.requestId = uuidv4();
+    this.originalRequest = request;
     var jwtString = ExtractJwt.fromExtractors([JwtStrategy.extractJWT])(
       request,
     );
     var jwtObj = decode(jwtString);
+    if (!jwtObj) {
+      return;
+    }
     this.email = jwtObj['email'];
     this.userId = jwtObj['userId'];
-    this.requestId = uuidv4();
-    this.originalRequest = request;
   }
 }

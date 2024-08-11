@@ -1,12 +1,12 @@
 import { TourCategory } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsEnum, Length } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, Length } from 'class-validator';
+import { IsHexadecimalString } from 'src/validations/ishex.validation';
 import {
   CURSOR_INVALID_VALUE,
   CURSOR_VALID_LENGTH,
   DEFAULT_TOURS_SIZE,
 } from './constant';
-import { IsHexadecimalString } from 'src/validations/ishex.validation';
 
 export class GetTourDto {
   @IsOptional()
@@ -20,7 +20,10 @@ export class GetTourDto {
   @Type(() => Number)
   size = DEFAULT_TOURS_SIZE;
 
-  @IsEnum(TourCategory)
+  @IsEnum(TourCategory, {
+    message: (validateArgs) =>
+      `${validateArgs.value} is not a valid tour category`,
+  })
   @IsOptional()
   public category?: TourCategory;
 }

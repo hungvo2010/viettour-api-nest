@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Logger,
   Param,
   Post,
   Query,
@@ -10,7 +9,9 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { RequestContext } from 'src/common/data/context/RequestContext';
 import { buildHateoasUrl } from 'src/common/utils';
+import { CustomLogger } from 'src/logger/custom-logger';
 import { FindAddressDto } from '../dto/find-address.dto';
 import { GetTourDto } from '../dto/get-tour.dto';
 import { LikeTourDto } from '../dto/like-tour.dto';
@@ -19,12 +20,18 @@ import { JwtAuthGuard } from './../../guards/jwt-auth.guard';
 
 @Controller('/v1.0/tours')
 export class TourViewerController {
-  constructor(private readonly tourService: TourService) {}
-  private readonly logger = new Logger(TourViewerController.name);
+  constructor(
+    private readonly tourService: TourService,
+    private readonly context: RequestContext,
+    private readonly logger: CustomLogger,
+  ) {}
 
   @Get('')
   async getAllTours(@Request() req, @Query() queryDto: GetTourDto) {
-    this.logger.log(`getAllTours: ${JSON.stringify(queryDto)}`);
+    this.logger.logInfo(
+      this.context,
+      `getAllTours: ${JSON.stringify(queryDto)}`,
+    );
     const [total, tours] = await this.tourService.getAllTours(queryDto);
     return {
       total,
