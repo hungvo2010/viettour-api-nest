@@ -41,4 +41,4 @@ lerna-debug.log*
 .env.*.local
 .env.development
 .env.production
-migrate-mongo-config.js
+# migrate-mongo-config.js
