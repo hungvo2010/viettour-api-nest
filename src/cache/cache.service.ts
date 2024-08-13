@@ -7,10 +7,9 @@ import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class CacheService {
-  constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private readonly prismaService: PrismaService,
-  ) {}
+  @Inject(CACHE_MANAGER) 
+  private cacheManager: Cache;
+  constructor(private readonly prismaService: PrismaService) {}
   private readonly logger = new Logger(CacheService.name);
 
   async deleteCreatorToursCache(userId: string) {

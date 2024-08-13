@@ -15,6 +15,7 @@ import { TimestampInterceptor } from './interceptors/timestamp.interceptor';
 import { LoggerModule } from './logger/logger.module';
 import { MetricsService } from './metrics/metric.service';
 import { LoggerMiddleware } from './middleware/LoggerMiddleware';
+import { PrismaService } from './prisma.service';
 import { TourModule } from './tour/tour.module';
 import { UsersModule } from './users/users.module';
 
@@ -47,10 +48,11 @@ import { UsersModule } from './users/users.module';
     }),
   ],
   controllers: [AppController],
-  exports: [MetricsService, RequestContext],
+  exports: [MetricsService, PrismaService, RequestContext],
   providers: [
     MetricsService,
     HelloService,
+    PrismaService,
     RequestContext,
     AppService,
     {

@@ -1,18 +1,21 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { TourService } from './tour.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Test, TestingModule } from '@nestjs/testing';
+import { AppModule } from 'src/app.module';
+import { TourService } from './tour.service';
 
-// describe('TourService', () => {
-//   let service: TourService;
+describe('TourService', () => {
+  let service: TourService;
 
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       providers: [TourService],
-//     }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+      providers: [{ provide: CACHE_MANAGER, useValue: {} }],
+    }).compile();
 
-//     service = module.get<TourService>(TourService);
-//   });
+    service = module.get<TourService>(TourService);
+  });
 
-//   it('should be defined', () => {
-//     expect(service).toBeDefined();
-//   });
-// });
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+});

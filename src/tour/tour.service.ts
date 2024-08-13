@@ -1,11 +1,9 @@
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Cache } from 'cache-manager';
 
 import { EditStatus, PrivacyStatus, Tour, TourCategory } from '@prisma/client';
 import { CacheService } from 'src/cache/cache.service';
@@ -18,12 +16,10 @@ import {
   GET_TOUR_RESPONSE,
 } from './res/get-tour-response';
 import { FIND_ONE_CONFIG_CONDITION } from './tour.constant';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class TourService {
   constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly prismaService: PrismaService,
     private nativeMongoService: NativeMongoService,
     private readonly cacheService: CacheService,

@@ -1,5 +1,7 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CacheService } from 'src/cache/cache.service';
+import { MetricsService } from 'src/metrics/metric.service';
 import { PrismaService } from 'src/prisma.service';
 import { NativeMongoService } from 'src/tour/controller/native.mongo.service';
 import { TourService } from 'src/tour/tour.service';
@@ -13,10 +15,12 @@ describe('UsersController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
-        UsersService,
         PrismaService,
         TourService,
+        UsersService,
         CacheService,
+        MetricsService,
+        { provide: CACHE_MANAGER, useValue: {} },
         NativeMongoService,
       ],
     }).compile();
