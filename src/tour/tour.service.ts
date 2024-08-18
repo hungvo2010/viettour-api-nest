@@ -9,8 +9,11 @@ import { EditStatus, PrivacyStatus, Tour, TourCategory } from '@prisma/client';
 import { CacheService } from 'src/cache/cache.service';
 import { Constant } from 'src/common/constant';
 import { PrismaService } from 'src/prisma.service';
+import { ArgumentType } from './argument.type';
 import { NativeMongoService } from './controller/native.mongo.service';
-import { GetTourDto } from './dto/get-tour.dto';
+import { GetTourDto } from './dto/request/get-tour.dto';
+import { FilterToursResponse } from './dto/response/filter.tours.response';
+import { FilterArguments } from './filter.arguments';
 import {
   GET_TOUR_BY_CREATOR_RESPONSE,
   GET_TOUR_RESPONSE,
@@ -33,11 +36,21 @@ export class TourService {
         where: this.publicToursByCategoryCondition(queryParams.category),
       }),
       this.prismaService.tour.findMany({
-        ...this.buildCursorParams(queryParams.size, queryParams.cursor),
+        ...this.buildCursorParams(queryParams.offset, queryParams.cursor),
         select: GET_TOUR_RESPONSE,
         where: this.publicToursByCategoryCondition(queryParams.category),
       }),
     ]);
+  }
+
+  async getAllToursNew(
+    filterArguments: FilterArguments,
+  ): Promise<FilterToursResponse<Tour>> {
+    this.prismaService.tour.findMany({
+      ...this.buildCursorParams(filterArguments.ofType(ArgumentType.CURSOR)),
+      select: GET_TOUR_RESPONSE,
+      where: this.publicToursByCategoryCondition(queryParams.category),
+    });
   }
 
   async getToursWithFilter(query: string) {

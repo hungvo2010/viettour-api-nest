@@ -12,9 +12,10 @@ import {
 import { RequestContext } from 'src/common/data/context/RequestContext';
 import { buildHateoasUrl } from 'src/common/utils';
 import { CustomLogger } from 'src/logger/custom-logger';
-import { FindAddressDto } from '../dto/find-address.dto';
-import { GetTourDto } from '../dto/get-tour.dto';
-import { LikeTourDto } from '../dto/like-tour.dto';
+import { FindAddressDto } from '../dto/request/find-address.dto';
+import { GetTourDto } from '../dto/request/get-tour.dto';
+import { LikeTourDto } from '../dto/request/like-tour.dto';
+import { FilterArguments } from '../filter.arguments';
 import { TourService } from '../tour.service';
 import { JwtAuthGuard } from './../../guards/jwt-auth.guard';
 
@@ -32,7 +33,10 @@ export class TourViewerController {
       this.context,
       `getAllTours: ${JSON.stringify(queryDto)}`,
     );
-    const [total, tours] = await this.tourService.getAllTours(queryDto);
+    const filterArguments = this.buildFilterArguments(queryDto);
+    const [total, tours] = await this.tourService.getAllToursNew(
+      filterArguments,
+    );
     return {
       total,
       length: tours.length,
@@ -93,5 +97,14 @@ export class TourViewerController {
     return {
       message: 'Deleted tour successfully',
     };
+  }
+
+  buildFilterArguments(queryDto: GetTourDto): FilterArguments[] {
+    var allFilters = Object.assign({}, queryDto);
+    var results: FilterArguments[] = [];
+    for (const key in allFilters) {
+      results.push(new FilterArguments(key, allFilters[key]));
+    }
+    return results;
   }
 }

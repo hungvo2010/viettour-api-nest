@@ -18,7 +18,11 @@ export class GetTourDto {
 
   @IsNumber()
   @Type(() => Number)
-  size = DEFAULT_TOURS_SIZE;
+  offset = DEFAULT_TOURS_SIZE;
+
+  @IsNumber()
+  @Type(() => Number)
+  limit = 0;
 
   @IsEnum(TourCategory, {
     message: (validateArgs) =>
