@@ -1,3 +1,7 @@
 export class PaginationCriteria {
-  constructor(public size: number, public cursor: any) {}
+  constructor(
+    public limit: number,
+    public offset: number,
+    public cursor: any,
+  ) {}
 }

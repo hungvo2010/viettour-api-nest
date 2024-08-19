@@ -10,8 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RequestContext } from 'src/common/data/context/RequestContext';
+import { Response } from 'src/common/data/response/Response';
 import { buildHateoasUrl } from 'src/common/utils';
+import { ResponseUtils } from 'src/common/utils/ResponseUtils';
 import { CustomLogger } from 'src/logger/custom-logger';
+import { ArgumentType } from '../argument.type';
+import { PaginationCriteria } from '../criteria/pagination.criteria';
 import { FindAddressDto } from '../dto/request/find-address.dto';
 import { GetTourDto } from '../dto/request/get-tour.dto';
 import { LikeTourDto } from '../dto/request/like-tour.dto';
@@ -28,16 +32,17 @@ export class TourViewerController {
   ) {}
 
   @Get('')
-  async getAllTours(@Request() req, @Query() queryDto: GetTourDto) {
+  async getAllTours(
+    @Request() req,
+    @Query() queryDto: GetTourDto,
+  ): Promise<Response<any>> {
     this.logger.logInfo(
       this.context,
       `getAllTours: ${JSON.stringify(queryDto)}`,
     );
     const filterArguments = this.buildFilterArguments(queryDto);
-    const [total, tours] = await this.tourService.getAllToursNew(
-      filterArguments,
-    );
-    return {
+    const [total, tours] = await this.tourService.getAllToursNew(queryDto);
+    return ResponseUtils.ok({
       total,
       length: tours.length,
       values: tours,
@@ -45,7 +50,7 @@ export class TourViewerController {
         ...queryDto,
         cursor: tours[tours.length - 1]?.id,
       }),
-    };
+    });
   }
 
   @Get('/search')
@@ -99,12 +104,4 @@ export class TourViewerController {
     };
   }
 
-  buildFilterArguments(queryDto: GetTourDto): FilterArguments[] {
-    var allFilters = Object.assign({}, queryDto);
-    var results: FilterArguments[] = [];
-    for (const key in allFilters) {
-      results.push(new FilterArguments(key, allFilters[key]));
-    }
-    return results;
-  }
 }

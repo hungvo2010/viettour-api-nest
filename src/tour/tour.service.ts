@@ -11,6 +11,9 @@ import { Constant } from 'src/common/constant';
 import { PrismaService } from 'src/prisma.service';
 import { ArgumentType } from './argument.type';
 import { NativeMongoService } from './controller/native.mongo.service';
+import { FilterCriteria } from './criteria/filter.criteria';
+import { PaginationCriteria } from './criteria/pagination.criteria';
+import { SortingCriteria } from './criteria/sorting.criteria';
 import { GetTourDto } from './dto/request/get-tour.dto';
 import { FilterToursResponse } from './dto/response/filter.tours.response';
 import { FilterArguments } from './filter.arguments';
@@ -44,8 +47,9 @@ export class TourService {
   }
 
   async getAllToursNew(
-    filterArguments: FilterArguments,
+    queryDto: GetTourDto,
   ): Promise<FilterToursResponse<Tour>> {
+    var filterArguments = this.buildFilterArguments(queryDto);
     this.prismaService.tour.findMany({
       ...this.buildCursorParams(filterArguments.ofType(ArgumentType.CURSOR)),
       select: GET_TOUR_RESPONSE,
@@ -193,5 +197,16 @@ export class TourService {
       Constant.CACHE_KEY_ENCODEURL,
       url,
     )) as string;
+  }
+  buildFilterArguments(queryDto: GetTourDto): FilterArguments {
+    var allFilters = Object.assign({}, queryDto);
+    var results: FilterArguments = new FilterArguments();
+    results.add(ArgumentType.SORTING, new SortingCriteria(queryDto.sort));
+    results.add(
+      ArgumentType.PAGINATION,
+      new PaginationCriteria(queryDto.limit, queryDto.offset, queryDto.cursor),
+    );
+    results.add(ArgumentType.FILTER, new FilterCriteria(allFilters));
+    return results;
   }
 }

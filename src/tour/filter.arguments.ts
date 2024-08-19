@@ -1,4 +1,5 @@
 import { ArgumentType } from './argument.type';
+import { ICommonCriteria } from './criteria/common.criteria';
 
 export class FilterArguments {
   // filter by enum: ?type=[PRIVATE, PUBLIC]
@@ -7,26 +8,22 @@ export class FilterArguments {
   // logical operators: ?a=1&b=2&c=3||a=1&b=2&c=3
   // limit, offset: ?limit=10&offset=20
   // multiple field sortings: ?sort=-price,name
-  private filterType: ArgumentType;
-  private key: string;
-  private value: string;
-  private filterArguments: Map<ArgumentType, string> = new Map();
-  constructor(key: string, value: string) {
-    this.key = key;
-    this.value = value;
-    this.filterType = this.parseFilterType(key);
-  }
+  private filterArguments: Map<ArgumentType, ICommonCriteria> = new Map();
 
-  parseFilterType(key: string): ArgumentType {
+  parseArgType(key: string): ArgumentType {
     switch (key) {
       case 'type':
-        return ArgumentType.BY_TYPE;
+        return ArgumentType.FILTER;
       default:
-        return ArgumentType.BY_TYPE;
+        return ArgumentType.FILTER;
     }
   }
 
-  ofType(type: ArgumentType): string {
+  add(type: ArgumentType, criteria: ICommonCriteria) {
+    this.filterArguments.set(type, criteria);
+  }
+
+  ofType(type: ArgumentType): ICommonCriteria {
     return this.filterArguments.get(type);
   }
 }

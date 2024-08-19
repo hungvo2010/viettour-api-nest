@@ -14,7 +14,7 @@ import { HelloService } from './hello/HelloService';
 import { TimestampInterceptor } from './interceptors/timestamp.interceptor';
 import { LoggerModule } from './logger/logger.module';
 import { MetricsService } from './metrics/metric.service';
-import { LoggerMiddleware } from './middleware/LoggerMiddleware';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 import { PrismaService } from './prisma.service';
 import { TourModule } from './tour/tour.module';
 import { UsersModule } from './users/users.module';

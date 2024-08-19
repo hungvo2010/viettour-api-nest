@@ -30,4 +30,7 @@ export class GetTourDto {
   })
   @IsOptional()
   public category?: TourCategory;
+
+  @IsOptional()
+  public sort?: string;
 }
