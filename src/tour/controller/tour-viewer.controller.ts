@@ -11,15 +11,11 @@ import {
 } from '@nestjs/common';
 import { RequestContext } from 'src/common/data/context/RequestContext';
 import { Response } from 'src/common/data/response/Response';
-import { buildHateoasUrl } from 'src/common/utils';
 import { ResponseUtils } from 'src/common/utils/ResponseUtils';
 import { CustomLogger } from 'src/logger/custom-logger';
-import { ArgumentType } from '../argument.type';
-import { PaginationCriteria } from '../criteria/pagination.criteria';
 import { FindAddressDto } from '../dto/request/find-address.dto';
 import { GetTourDto } from '../dto/request/get-tour.dto';
 import { LikeTourDto } from '../dto/request/like-tour.dto';
-import { FilterArguments } from '../filter.arguments';
 import { TourService } from '../tour.service';
 import { JwtAuthGuard } from './../../guards/jwt-auth.guard';
 
@@ -40,17 +36,8 @@ export class TourViewerController {
       this.context,
       `getAllTours: ${JSON.stringify(queryDto)}`,
     );
-    const filterArguments = this.buildFilterArguments(queryDto);
-    const [total, tours] = await this.tourService.getAllToursNew(queryDto);
-    return ResponseUtils.ok({
-      total,
-      length: tours.length,
-      values: tours,
-      next: buildHateoasUrl(req.path, {
-        ...queryDto,
-        cursor: tours[tours.length - 1]?.id,
-      }),
-    });
+    const filterTourResponse = await this.tourService.getAllToursNew(queryDto);
+    return ResponseUtils.ok(filterTourResponse);
   }
 
   @Get('/search')
@@ -103,5 +90,4 @@ export class TourViewerController {
       message: 'Deleted tour successfully',
     };
   }
-
 }

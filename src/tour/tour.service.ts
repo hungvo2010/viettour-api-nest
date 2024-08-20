@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { EditStatus, PrivacyStatus, Tour, TourCategory } from '@prisma/client';
+import { Tour } from '@prisma/client';
 import { CacheService } from 'src/cache/cache.service';
 import { Constant } from 'src/common/constant';
 import { PrismaService } from 'src/prisma.service';
@@ -17,10 +17,8 @@ import { SortingCriteria } from './criteria/sorting.criteria';
 import { GetTourDto } from './dto/request/get-tour.dto';
 import { FilterToursResponse } from './dto/response/filter.tours.response';
 import { FilterArguments } from './filter.arguments';
-import {
-  GET_TOUR_BY_CREATOR_RESPONSE,
-  GET_TOUR_RESPONSE,
-} from './res/get-tour-response';
+import { TourPagination } from './interface/tour.pagination';
+import { GET_TOUR_BY_CREATOR_RESPONSE } from './res/get-tour-response';
 import { FIND_ONE_CONFIG_CONDITION } from './tour.constant';
 
 @Injectable()
@@ -32,29 +30,44 @@ export class TourService {
   ) {}
   private readonly logger = new Logger(TourService.name);
 
-  async getAllTours(queryParams: GetTourDto) {
-    this.logger.log(`getAllTours: ${JSON.stringify(queryParams)}`);
-    return await this.prismaService.$transaction([
-      this.prismaService.tour.count({
-        where: this.publicToursByCategoryCondition(queryParams.category),
-      }),
-      this.prismaService.tour.findMany({
-        ...this.buildCursorParams(queryParams.offset, queryParams.cursor),
-        select: GET_TOUR_RESPONSE,
-        where: this.publicToursByCategoryCondition(queryParams.category),
-      }),
-    ]);
-  }
+  // async getAllTours(queryParams: GetTourDto) {
+  //   this.logger.log(`getAllTours: ${JSON.stringify(queryParams)}`);
+  //   return await this.prismaService.$transaction([
+  //     this.prismaService.tour.count({
+  //       where: this.filterTours(queryParams.category),
+  //     }),
+  //     this.prismaService.tour.findMany({
+  //       ...this.buildCursorParams(queryParams.offset, queryParams.cursor),
+  //       select: GET_TOUR_RESPONSE,
+  //       where: this.filterTours(queryParams.category),
+  //     }),
+  //   ]);
+  // }
 
   async getAllToursNew(
     queryDto: GetTourDto,
   ): Promise<FilterToursResponse<Tour>> {
-    var filterArguments = this.buildFilterArguments(queryDto);
-    this.prismaService.tour.findMany({
-      ...this.buildCursorParams(filterArguments.ofType(ArgumentType.CURSOR)),
-      select: GET_TOUR_RESPONSE,
-      where: this.publicToursByCategoryCondition(queryParams.category),
+    let filterArguments = this.buildFilterArguments(queryDto);
+    let tours = await this.prismaService.tour.findMany({
+      ...this.buildCursorParams(
+        filterArguments.ofType(ArgumentType.PAGINATION) as PaginationCriteria,
+      ),
+      orderBy: this.buildSortingParams(
+        filterArguments.ofType(ArgumentType.SORTING) as SortingCriteria,
+      ),
+      where: this.filterToursNew(
+        filterArguments.ofType(ArgumentType.FILTER) as FilterCriteria,
+      ),
     });
+    return new FilterToursResponse(tours.length, tours, '');
+  }
+
+  buildSortingParams(sorting: SortingCriteria) {
+    var result = {};
+    sorting.getConfig().forEach((val) => {
+      result[val.field] = val.order;
+    });
+    return result;
   }
 
   async getToursWithFilter(query: string) {
@@ -166,23 +179,29 @@ export class TourService {
     });
   }
 
-  buildCursorParams(size: number, cursor: string) {
+  buildCursorParams(pagination: PaginationCriteria): TourPagination {
+    if (pagination.cursor) {
+      return {
+        take: pagination.limit,
+        ...(pagination.cursor && {
+          cursor: { id: pagination.cursor },
+          skip: 1,
+        }),
+      };
+    }
     return {
-      take: size,
-      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      take: pagination.limit,
+      skip: pagination.offset,
     };
   }
 
-  publicToursByCategoryCondition(category: TourCategory) {
-    return {
-      category,
-      config: {
-        is: {
-          privacyStatus: PrivacyStatus.PUBLIC,
-          editStatus: EditStatus.PUBLISHED,
-        },
-      },
-    };
+  filterToursNew(filterCriteria: FilterCriteria) {
+    var filters = filterCriteria.getFilters();
+    var result = {};
+    Object.keys(filters).forEach((key) => {
+      result[key] = filters[key];
+    });
+    return result;
   }
 
   async getTourFromCache(tourId: string): Promise<Tour | undefined> {
