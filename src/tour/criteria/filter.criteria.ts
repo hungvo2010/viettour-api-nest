@@ -12,6 +12,17 @@ export class FilterCriteria implements ICommonCriteria {
   }
 
   public getFilters() {
+    let a: {
+      readonly b: number;
+      c?: string;
+      [key: number]: boolean;
+    } = {
+      b: 1,
+      c: '2',
+      0: true,
+      1: false,
+    };
+    let obj: object;
     return this.filters;
   }
 }
