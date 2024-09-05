@@ -223,7 +223,7 @@ export class TourService {
     results.add(ArgumentType.SORTING, new SortingCriteria(queryDto.sort));
     results.add(
       ArgumentType.PAGINATION,
-      new PaginationCriteria(queryDto.limit, queryDto.offset, queryDto.cursor),
+      new PaginationCriteria(queryDto.pagination),
     );
     results.add(ArgumentType.FILTER, new FilterCriteria(allFilters));
     return results;

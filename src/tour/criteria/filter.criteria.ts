@@ -1,9 +1,9 @@
-import qs, { ParsedQs } from 'qs';
+import * as qs from 'qs'
 import { GetTourDto } from '../dto/request/get-tour.dto';
 import { ICommonCriteria } from './common.criteria';
 
 export class FilterCriteria implements ICommonCriteria {
-  private filters: ParsedQs;
+  private filters: qs.ParsedQs;
   constructor(private filter: GetTourDto) {
     console.log(this.filter);
     let remainQs = new URLSearchParams(JSON.stringify(this.filter)).toString();
